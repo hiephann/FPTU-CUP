@@ -1,0 +1,35 @@
+@startuml uc_others
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam usecaseBackgroundColor White
+skinparam usecaseBorderColor #333333
+skinparam rectangleBorderColor #333333
+left to right direction
+actor "Team Manager" as TM
+actor "Referee" as Ref
+actor "Guest" as Guest
+rectangle "Student Football Tournament Management API" {
+  usecase "Register account" as U1
+  usecase "Login / Logout" as U2
+  usecase "Register team" as U3
+  usecase "Manage players" as U4
+  usecase "Submit starting lineup" as U5
+  usecase "Start / finish match" as U6
+  usecase "Record goals, cards,\nsubstitutions" as U7
+  usecase "View tournaments, teams,\nplayers" as U8
+  usecase "View schedule & match detail" as U9
+  usecase "View standings, top scorers,\nsuspensions" as U10
+}
+TM --> U1
+TM --> U2
+TM --> U3
+TM --> U4
+TM --> U5
+U2 <-- Ref
+U6 <-- Ref
+U7 <-- Ref
+U8 <-- Guest
+U9 <-- Guest
+U10 <-- Guest
+@enduml

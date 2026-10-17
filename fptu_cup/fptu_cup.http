@@ -1,0 +1,6 @@
+@fptu_cup_HostAddress = http://localhost:5100
+
+GET {{fptu_cup_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

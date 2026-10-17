@@ -1,0 +1,137 @@
+@startuml erd
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam linetype ortho
+hide circle
+skinparam classBackgroundColor White
+skinparam classBorderColor #333333
+skinparam classHeaderBackgroundColor #FFE8E1
+entity Users {
+  * Id : int <<PK>>
+  --
+  Username : nvarchar(50) <<UQ>>
+  PasswordHash : nvarchar(255)
+  FullName : nvarchar(100)
+  Email : nvarchar(100) <<UQ>>
+  Role : nvarchar(20)
+  IsActive : bit
+  CreatedAt : datetime2
+}
+entity Tournaments {
+  * Id : int <<PK>>
+  --
+  Name : nvarchar(150)
+  Season : nvarchar(20)
+  StartDate : date
+  EndDate : date
+  MaxTeams : int
+  NumberOfLegs : tinyint
+  Status : nvarchar(20)
+  CreatedBy : int <<FK>>
+}
+entity Teams {
+  * Id : int <<PK>>
+  --
+  TournamentId : int <<FK>>
+  ManagerId : int <<FK>>
+  Name : nvarchar(100)
+  Faculty : nvarchar(100)
+  LogoUrl : nvarchar(255)
+  KitColor : nvarchar(30)
+  Status : nvarchar(20)
+}
+entity Players {
+  * Id : int <<PK>>
+  --
+  TeamId : int <<FK>>
+  StudentCode : varchar(20)
+  FullName : nvarchar(100)
+  ShirtNumber : int
+  Position : varchar(2)
+  DateOfBirth : date
+}
+entity Venues {
+  * Id : int <<PK>>
+  --
+  Name : nvarchar(100)
+  Address : nvarchar(255)
+  Capacity : int
+}
+entity Matches {
+  * Id : int <<PK>>
+  --
+  TournamentId : int <<FK>>
+  Round : int
+  HomeTeamId : int <<FK>>
+  AwayTeamId : int <<FK>>
+  VenueId : int <<FK>>
+  RefereeId : int <<FK>>
+  KickoffTime : datetime2
+  HomeScore : int
+  AwayScore : int
+  Status : nvarchar(20)
+  UpdatedBy : int <<FK>>
+  UpdatedAt : datetime2
+}
+entity MatchLineups {
+  * Id : int <<PK>>
+  --
+  MatchId : int <<FK>>
+  TeamId : int <<FK>>
+  PlayerId : int <<FK>>
+  IsStarter : bit
+}
+entity Substitutions {
+  * Id : int <<PK>>
+  --
+  MatchId : int <<FK>>
+  TeamId : int <<FK>>
+  PlayerOutId : int <<FK>>
+  PlayerInId : int <<FK>>
+  Minute : int
+}
+entity Goals {
+  * Id : int <<PK>>
+  --
+  MatchId : int <<FK>>
+  PlayerId : int <<FK>>
+  TeamId : int <<FK>>
+  Minute : int
+  IsOwnGoal : bit
+}
+entity Cards {
+  * Id : int <<PK>>
+  --
+  MatchId : int <<FK>>
+  PlayerId : int <<FK>>
+  CardType : nvarchar(10)
+  Minute : int
+}
+entity Suspensions {
+  * Id : int <<PK>>
+  --
+  PlayerId : int <<FK>>
+  TournamentId : int <<FK>>
+  Reason : nvarchar(100)
+  MatchesRemaining : int
+}
+Users ||--o{ Tournaments : creates
+Users ||--o{ Teams : manages
+Users |o--o{ Matches : referees
+Tournaments ||--o{ Teams
+Tournaments ||--o{ Matches
+Teams ||--o{ Players
+Venues ||--o{ Matches
+Teams ||--o{ Matches : home/away
+Matches ||--o{ MatchLineups
+Matches ||--o{ Substitutions
+Matches ||--o{ Goals
+Matches ||--o{ Cards
+Players ||--o{ MatchLineups
+Players ||--o{ Goals
+Players ||--o{ Cards
+Players ||--o{ Substitutions
+Players ||--o{ Suspensions
+Tournaments ||--o{ Suspensions
+@enduml

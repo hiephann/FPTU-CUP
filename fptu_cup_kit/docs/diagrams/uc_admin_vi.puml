@@ -1,0 +1,32 @@
+@startuml uc_admin_vi
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam usecaseBackgroundColor White
+skinparam usecaseBorderColor #333333
+skinparam rectangleBorderColor #333333
+left to right direction
+actor "Admin\n(Ban tổ chức)" as Admin
+rectangle "Hệ thống Quản lý Giải bóng đá Sinh viên (API)" {
+  usecase "Đăng nhập / Đăng xuất" as UC1
+  usecase "Đổi mật khẩu" as UC3
+  usecase "Quản lý tài khoản\n(tạo trọng tài, khóa/mở)" as UC4
+  usecase "Quản lý giải đấu\n(CRUD, trạng thái, số lượt)" as UC5
+  usecase "Duyệt / từ chối đội" as UC6
+  usecase "Quản lý sân" as UC7
+  usecase "Sinh lịch vòng tròn" as UC8
+  usecase "Quản lý trận đấu\n(tạo, đổi lịch, phân công trọng tài)" as UC9
+  usecase "Sửa kết quả trận" as UC10
+  usecase "Xem tổng quan giải" as UC11
+}
+Admin --> UC1
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+Admin --> UC11
+@enduml

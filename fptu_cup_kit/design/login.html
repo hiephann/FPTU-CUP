@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng nhập – FPTU Cup 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F5F0;}
+a{color:#1F7A4D;text-decoration:none}a:hover{color:#145637;text-decoration:underline}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; display: flex; flex-wrap: wrap; background: #F4F5F0; color: #10201A; font-family: 'Be Vietnam Pro', sans-serif;">
+
+<section style="flex: 1 1 520px; background: #10201A; color: #FFFFFF; padding: 48px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; min-height: 560px;">
+<a href="index.html" style="display: flex; align-items: center; gap: 12px; color: #FFFFFF; text-decoration: none;">
+<span style="width: 44px; height: 44px; border-radius: 10px; background: #1F7A4D; display: flex; align-items: center; justify-content: center;">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7l4 3-1.5 4.5h-5L8 10z"></path><path d="M12 3v4M16 10l4.5-1.5M14.5 14.5l2.5 4M9.5 14.5l-2.5 4M8 10L3.5 8.5"></path></svg>
+</span>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: .02em;">FPTU CUP 2026</span>
+</a>
+
+<svg viewBox="0 0 400 260" width="100%" style="max-width: 520px;" fill="none" stroke="#3D5A4B" stroke-width="2" aria-hidden="true">
+<rect x="2" y="2" width="396" height="256" rx="6"></rect>
+<line x1="200" y1="2" x2="200" y2="258"></line>
+<circle cx="200" cy="130" r="38"></circle>
+<circle cx="200" cy="130" r="3" fill="#3D5A4B"></circle>
+<rect x="2" y="70" width="56" height="120"></rect>
+<rect x="342" y="70" width="56" height="120"></rect>
+<rect x="2" y="105" width="20" height="50"></rect>
+<rect x="378" y="105" width="20" height="50"></rect>
+<path d="M58 105a28 28 0 010 50M342 105a28 28 0 000 50"></path>
+<circle cx="268" cy="96" r="9" stroke="#F2A23A" stroke-width="2.5"></circle>
+<path d="M120 170 C170 150 210 120 259 100" stroke="#F2A23A" stroke-dasharray="6 6"></path>
+</svg>
+
+<div style="display: flex; flex-direction: column; gap: 14px;">
+<h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 60px; line-height: .95; text-transform: uppercase;">Vào sân<br>điều hành giải</h1>
+<p style="margin: 0; font-size: 16px; line-height: 1.6; color: #C9D4CD; max-width: 460px;">Ban tổ chức quản lý lịch và kết quả, trọng tài ghi diễn biến trận, quản lý đội nộp đội hình trước giờ bóng lăn.</p>
+</div>
+</section>
+
+<section style="flex: 1 1 480px; padding: 48px; box-sizing: border-box; display: flex; align-items: center; justify-content: center;">
+<form onsubmit="return false" style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 700; text-transform: uppercase;">Đăng nhập</h2>
+<p style="margin: 0; font-size: 15px; color: #4A5A52;">Dùng tài khoản được cấp hoặc tài khoản quản lý đội.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<label for="u" style="font-size: 14px; font-weight: 600;">Tên đăng nhập</label>
+<input id="u" name="username" autocomplete="username" placeholder="vd. manager_cntt" style="min-height: 48px; padding: 0 14px; border: 1px solid #C9D1CC; border-radius: 10px; font: inherit; font-size: 15px; background: #FFFFFF; color: #10201A;">
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; justify-content: space-between; align-items: baseline;"><label for="p" style="font-size: 14px; font-weight: 600;">Mật khẩu</label><a href="#" style="font-size: 13px;">Quên mật khẩu?</a></div>
+<input id="p" name="password" type="password" autocomplete="current-password" style="min-height: 48px; padding: 0 14px; border: 1px solid #C9D1CC; border-radius: 10px; font: inherit; font-size: 15px; background: #FFFFFF; color: #10201A;">
+</div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 44px;"><input type="checkbox" style="width: 18px; height: 18px; accent-color: #1F7A4D;">Ghi nhớ đăng nhập</label>
+<button type="submit" style="min-height: 50px; border: 0; border-radius: 10px; background: #1F7A4D; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 600;">Đăng nhập</button>
+
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #4A5A52;"><span style="flex: 1 1 auto; height: 1px; background: #DDE2D9;"></span>hoặc<span style="flex: 1 1 auto; height: 1px; background: #DDE2D9;"></span></div>
+<a href="#" style="display: flex; justify-content: center; align-items: center; min-height: 48px; border-radius: 10px; border: 1px solid #10201A; color: #10201A; font-weight: 600; font-size: 15px; text-decoration: none;">Đăng ký làm quản lý đội</a>
+<a href="index.html" style="text-align: center; font-size: 14px; font-weight: 600;">Xem giải không cần đăng nhập</a>
+</form>
+</section>
+</div>
+</body>
+</html>

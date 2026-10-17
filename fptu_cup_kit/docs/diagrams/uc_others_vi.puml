@@ -1,0 +1,35 @@
+@startuml uc_others_vi
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam usecaseBackgroundColor White
+skinparam usecaseBorderColor #333333
+skinparam rectangleBorderColor #333333
+left to right direction
+actor "Team Manager" as TM
+actor "Referee" as Ref
+actor "Guest" as Guest
+rectangle "Hệ thống Quản lý Giải bóng đá Sinh viên (API)" {
+  usecase "Đăng ký tài khoản" as U1
+  usecase "Đăng nhập / Đăng xuất" as U2
+  usecase "Đăng ký đội" as U3
+  usecase "Quản lý cầu thủ" as U4
+  usecase "Nộp đội hình xuất phát" as U5
+  usecase "Bắt đầu / kết thúc trận" as U6
+  usecase "Ghi bàn thắng, thẻ phạt,\nthay người" as U7
+  usecase "Xem giải đấu, đội bóng,\ncầu thủ" as U8
+  usecase "Xem lịch & chi tiết trận" as U9
+  usecase "Xem bảng xếp hạng, vua phá lưới,\ntreo giò" as U10
+}
+TM --> U1
+TM --> U2
+TM --> U3
+TM --> U4
+TM --> U5
+U2 <-- Ref
+U6 <-- Ref
+U7 <-- Ref
+U8 <-- Guest
+U9 <-- Guest
+U10 <-- Guest
+@enduml

@@ -1,0 +1,43 @@
+/* FPTU Cup – design tokens dùng chung cho 4 mẫu giao diện.
+   Nếu sau này dựng frontend (React/Tailwind...), copy các biến này sang. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Màu nền & chữ */
+  --color-ground: #F4F5F0;      /* nền trang */
+  --color-surface: #FFFFFF;     /* thẻ, bảng */
+  --color-ink: #10201A;         /* chữ chính, header tối */
+  --color-ink-2: #33433B;       /* chữ phụ đậm */
+  --color-muted: #4A5A52;       /* chú thích (đạt 4.5:1 trên nền) */
+  --color-line: #E3E7DF;        /* viền thẻ */
+  --color-line-2: #ECEFE8;      /* kẻ dòng bảng */
+
+  /* Màu thương hiệu */
+  --color-accent: #1F7A4D;      /* xanh sân cỏ – nút chính, link */
+  --color-accent-dark: #145637;
+  --color-accent-soft: #E3F1E8;
+  --color-highlight: #F2A23A;   /* cam – điểm nhấn, badge */
+
+  /* Trạng thái thi đấu */
+  --color-win: #1F7A4D;
+  --color-draw: #C9D1CC;
+  --color-loss: #D93025;
+  --color-card-yellow: #F5C518;
+  --color-card-red: #D93025;
+  --color-warn-bg: #FFF4E5;  --color-warn-fg: #8A4B00;
+  --color-error-bg: #FDECEA; --color-error-fg: #A3231A;
+
+  /* Vị trí cầu thủ */
+  --pos-gk: #F5DFA0; --pos-df: #D8E6F5; --pos-mf: #DDEFE3; --pos-fw: #F8DCD0;
+
+  /* Chữ */
+  --font-display: 'Barlow Condensed', sans-serif;  /* tiêu đề, tỉ số, số liệu – viết HOA */
+  --font-body: 'Be Vietnam Pro', sans-serif;       /* nội dung, hỗ trợ tiếng Việt */
+
+  /* Bo góc & khoảng cách */
+  --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 40px; --space-8: 64px;
+  --container: 1240px;
+  --touch: 44px;   /* chiều cao tối thiểu của nút */
+}

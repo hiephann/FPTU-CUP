@@ -1,0 +1,33 @@
+@startuml flow_vi
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activityBackgroundColor White
+skinparam activityBorderColor #333333
+skinparam activityDiamondBackgroundColor White
+skinparam swimlaneBorderColor #999999
+|Admin (Ban tổ chức)|
+start
+:POST /auth/login;
+:POST /tournaments\n(status = Draft);
+:PATCH /tournaments/{id}/status\n→ Registration;
+|Team Manager (Quản lý đội)|
+:POST /auth/register, /auth/login;
+:POST /tournaments/{id}/teams;
+:POST /teams/{id}/players\n(7–14 cầu thủ);
+|Admin (Ban tổ chức)|
+:PATCH /teams/{id}/approval;
+:PATCH /tournaments/{id}/status\n→ Ongoing;
+:POST /tournaments/{id}/matches/generate\n(vòng tròn, 1 hoặc 2 lượt);
+:PUT /matches/{id}\n(sân, trọng tài, giờ đá);
+|Team Manager (Quản lý đội)|
+:PUT /matches/{id}/lineups/{teamId}\n(7 xuất phát + dự bị);
+|Referee (Trọng tài)|
+:PATCH /matches/{id}/status → InProgress;
+:POST /matches/{id}/goals | cards | substitutions;
+:PATCH /matches/{id}/status → Finished;
+|Guest (Khách)|
+:GET /matches/{id}\n(đội hình, bàn thắng, thẻ, thay người);
+:GET /tournaments/{id}/standings\nGET /tournaments/{id}/top-scorers;
+stop
+@enduml

@@ -1,0 +1,33 @@
+@startuml flow
+skinparam dpi 200
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam activityBackgroundColor White
+skinparam activityBorderColor #333333
+skinparam activityDiamondBackgroundColor White
+skinparam swimlaneBorderColor #999999
+|Admin|
+start
+:POST /auth/login;
+:POST /tournaments\n(status = Draft);
+:PATCH /tournaments/{id}/status\n→ Registration;
+|Team Manager|
+:POST /auth/register, /auth/login;
+:POST /tournaments/{id}/teams;
+:POST /teams/{id}/players\n(7–14 players);
+|Admin|
+:PATCH /teams/{id}/approval;
+:PATCH /tournaments/{id}/status\n→ Ongoing;
+:POST /tournaments/{id}/matches/generate\n(round-robin, 1 or 2 legs);
+:PUT /matches/{id}\n(venue, referee, kickoff);
+|Team Manager|
+:PUT /matches/{id}/lineups/{teamId}\n(7 starters + substitutes);
+|Referee|
+:PATCH /matches/{id}/status → InProgress;
+:POST /matches/{id}/goals | cards | substitutions;
+:PATCH /matches/{id}/status → Finished;
+|Guest|
+:GET /matches/{id}\n(lineups, goals, cards, substitutions);
+:GET /tournaments/{id}/standings\nGET /tournaments/{id}/top-scorers;
+stop
+@enduml
