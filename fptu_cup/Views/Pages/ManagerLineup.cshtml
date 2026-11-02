@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Nộp đội hình – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "TeamManager";
+    ViewData["Nav"] = "team";
+}
+
+<main class="admin-main" id="lineup-root">
+    <p class="muted">Đang tải…</p>
+</main>
+
+@section Scripts {
+    <script src="~/js/manager-lineup.js" asp-append-version="true"></script>
+}

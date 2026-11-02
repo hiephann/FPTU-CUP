@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Quản lý giải đấu – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "tournaments";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <h1>Giải đấu</h1>
+        <a class="btn btn-primary" href="#tao-giai">Thêm giải đấu</a>
+    </div>
+
+    <section class="panel">
+        <div class="card-head">
+            <h2>Danh sách giải</h2>
+            <span class="note">Trạng thái chuyển theo thứ tự Draft → Registration → Ongoing → Finished (BR04)</span>
+        </div>
+        <div id="tournament-table"><p class="muted">Đang tải…</p></div>
+    </section>
+
+    <section class="panel" id="tao-giai">
+        <h2>Thêm giải đấu</h2>
+        <form id="create-form">
+            <div class="form-grid">
+                <div class="field"><label for="t-name">Tên giải</label><input class="input" id="t-name" name="name" placeholder="vd. FPTU Student Football Cup 2027" required></div>
+                <div class="field"><label for="t-season">Mùa giải</label><input class="input" id="t-season" name="season" placeholder="vd. Fall 2027" required></div>
+                <div class="field"><label for="t-start">Ngày bắt đầu</label><input class="input" id="t-start" name="startDate" type="date" required></div>
+                <div class="field"><label for="t-end">Ngày kết thúc</label><input class="input" id="t-end" name="endDate" type="date" required></div>
+                <div class="field"><label for="t-max">Số đội tối đa (≥ 2)</label><input class="input" id="t-max" name="maxTeams" type="number" min="2" value="8" required></div>
+                <div class="field">
+                    <label for="t-legs">Thể thức vòng tròn</label>
+                    <select class="input" id="t-legs" name="numberOfLegs"><option value="1">1 lượt</option><option value="2" selected>2 lượt (đi – về)</option></select>
+                </div>
+            </div>
+            <p class="note">Giải mới luôn ở trạng thái Draft. Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.</p>
+            <button class="btn btn-primary" type="submit">Tạo giải đấu</button>
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-tournaments.js" asp-append-version="true"></script>
+}

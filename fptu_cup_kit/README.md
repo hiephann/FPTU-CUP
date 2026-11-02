@@ -9,6 +9,7 @@ Bài tập lớn cuối kỳ: ASP.NET Core Web API (.NET 8) + EF Core + SQL Serv
 | `CLAUDE.md` | Hướng dẫn dự án cho Claude Code (tự đọc mỗi phiên): công nghệ, cấu trúc, quy ước, thể thức giải, phân công |
 | `docs/requirements.md` | Đặc tả đầy đủ: tác nhân, use case, 31 FR, 36 API, phân quyền, 11 bảng, 22 BR, design spec 15 chức năng |
 | `docs/database/schema.sql` | Script SQL Server tham chiếu (11 bảng + view `vw_Standings`) |
+| `docs/postman/` | Bộ test Postman/Newman cho toàn bộ API (import collection + environment, xem `README.md` trong thư mục) |
 | `docs/diagrams/` | Sơ đồ use case, luồng API, ERD: file `.puml` (sửa được) và `.png` |
 | `docs/Requirement_Design_Specification_SFTMS.docx` | Báo cáo theo mẫu, tiếng Anh |
 | `docs/Dac_ta_Yeu_cau_Thiet_ke_SFTMS_VI.docx` | Báo cáo theo mẫu, tiếng Việt |

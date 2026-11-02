@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Tài khoản – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "users";
+}
+
+<main class="admin-main">
+    <div>
+        <h1>Tài khoản</h1>
+        <p class="muted">Tạo tài khoản trọng tài, khóa hoặc mở khóa tài khoản (FR04).</p>
+    </div>
+
+    <section class="panel">
+        <form class="filter-row" id="user-filter">
+            <label for="f-search" class="sr-only">Tìm tài khoản</label>
+            <input class="input" id="f-search" name="search" placeholder="Tìm theo tên đăng nhập, họ tên, email">
+            <label for="f-role" class="sr-only">Vai trò</label>
+            <select class="input" id="f-role" name="role">
+                <option value="">Tất cả vai trò</option>
+                <option value="Admin">Admin</option>
+                <option value="Referee">Trọng tài</option>
+                <option value="TeamManager">Quản lý đội</option>
+            </select>
+            <button class="btn btn-dark" type="submit">Lọc</button>
+            <span class="note" id="user-count"></span>
+        </form>
+        <div id="user-table"><p class="muted">Đang tải…</p></div>
+        <div class="pager" id="user-pager"></div>
+    </section>
+
+    <section class="panel">
+        <h2>Tạo tài khoản trọng tài</h2>
+        <form id="referee-form">
+            <div class="form-grid">
+                <div class="field"><label for="u-name">Họ và tên</label><input class="input" id="u-name" name="fullName" required></div>
+                <div class="field"><label for="u-user">Tên đăng nhập</label><input class="input" id="u-user" name="username" required minlength="3"></div>
+                <div class="field"><label for="u-email">Email</label><input class="input" id="u-email" name="email" type="email" required></div>
+                <div class="field"><label for="u-pass">Mật khẩu (tối thiểu 8 ký tự)</label><input class="input" id="u-pass" name="password" type="password" required minlength="8"></div>
+            </div>
+            <button class="btn btn-primary" type="submit">Tạo trọng tài</button>
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-users.js" asp-append-version="true"></script>
+}

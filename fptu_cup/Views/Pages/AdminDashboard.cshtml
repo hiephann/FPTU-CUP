@@ -1,0 +1,40 @@
+@{
+    ViewData["Title"] = "Tổng quan – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "dashboard";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <div>
+            <h1>Tổng quan</h1>
+            <p class="muted" id="dash-sub"></p>
+        </div>
+        <div class="actions">
+            <a class="btn" href="/admin/matches#tao-tran">Thêm trận thủ công</a>
+            <a class="btn btn-primary" href="/admin/matches#sinh-lich">Sinh lịch vòng tròn</a>
+        </div>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="split">
+        <section class="panel panel-main">
+            <div class="card-head">
+                <h2 id="round-title">Vòng hiện tại</h2>
+                <a href="/admin/matches" style="font-size:14px;font-weight:600">Xem toàn bộ lịch</a>
+            </div>
+            <div id="round-table"></div>
+        </section>
+
+        <section class="panel panel-side">
+            <h2>Việc cần xử lý</h2>
+            <div id="todos"></div>
+        </section>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-dashboard.js" asp-append-version="true"></script>
+}

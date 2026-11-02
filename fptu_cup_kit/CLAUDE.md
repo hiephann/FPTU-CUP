@@ -2,7 +2,7 @@
 
 Bài tập lớn cuối kỳ của nhóm 3 người. Đây là **backend RESTful Web API**, không phải đồ án lớn.
 Không thêm Docker, Kafka/RabbitMQ, microservices, SignalR hay cloud. Nếu không được yêu cầu,
-cũng không dựng frontend; mẫu giao diện trong `design/` chỉ để tham khảo.
+cũng không dựng frontend riêng (React...); giao diện hiện có là MVC Razor mỏng gọi API, mẫu trong `design/` chỉ để tham khảo.
 
 Tài liệu gốc (khi có mâu thuẫn, ưu tiên theo thứ tự này):
 1. `docs/requirements.md` – đặc tả đầy đủ (FR, BR, API, CSDL, design spec 15 chức năng)
@@ -20,40 +20,35 @@ Tài liệu gốc (khi có mâu thuẫn, ưu tiên theo thứ tự này):
 | Validation | Data Annotations (hoặc FluentValidation nếu nhóm thống nhất) |
 | Tài liệu API | Swagger/OpenAPI (Swashbuckle) có nút Authorize nhập JWT |
 
-## Cấu trúc solution đề xuất
+## Cấu trúc project (đơn giản, dự án là API)
+
+Project nằm ở `fptu_cup/fptu_cup/` (namespace `fptu_cup`). Không có Service/Repository/interface: controller inject thẳng `FptuCupDbContext` và viết logic trong controller.
 
 ```
-FptuCup.sln
-src/FptuCup.Api/
-  Controllers/        // mỏng: nhận DTO, gọi Service, trả ApiResponse
-  Services/           // toàn bộ nghiệp vụ + kiểm tra BR01–BR22
-    Interfaces/
-  Repositories/       // truy cập dữ liệu qua DbContext
-    Interfaces/
-  Data/
-    FptuCupDbContext.cs
-    Configurations/   // IEntityTypeConfiguration<T> cho từng bảng
-    Seed/             // dữ liệu mẫu
-  Entities/           // 11 entity khớp docs/database/schema.sql
-  DTOs/               // Request/Response, KHÔNG trả Entity ra ngoài
-  Middlewares/        // ExceptionMiddleware trả JSON thống nhất
-  Common/             // ApiResponse<T>, PagedResult<T>, AppException, enums
-  Program.cs
-  appsettings.json
+Controllers/          // API controller: [ApiController], logic + kiểm tra BR01–BR23 viết thẳng ở đây
+  ApiControllerBase   // CurrentUserId, Success()/Created201()/Conflict409()... trả { success, message, data }
+  PagesController     // chỉ trả View(); không có logic
+Data/                 // FptuCupDbContext, Configurations/ (mỗi bảng một file), Seed/DbSeeder, Migrations/
+Entities/             // 11 entity khớp docs/database/schema.sql
+Common/               // ApiResponse<T>, PagedQuery, PagedResult<T>, Enums/
+Middlewares/          // ExceptionMiddleware (bắt lỗi bất ngờ -> 500 JSON)
+Views/                // khung HTML (MVC), KHÔNG chứa dữ liệu
+wwwroot/js, css       // JS gọi /api/... bằng fetch để dựng giao diện
+Program.cs, appsettings.json
 ```
 
 ## Quy ước code
 
-- Kiến trúc: Controller → Service → Repository → DbContext. Đăng ký mọi thứ bằng DI có sẵn.
-- Đặt tên PascalCase cho class/property, camelCase cho JSON. Mỗi file một class.
-- Mọi response dùng chung dạng `{ "success": bool, "message": string, "data": T }`.
-- API danh sách luôn phân trang `?page=&pageSize=&search=&sortBy=` (mặc định 10, tối đa 50).
-- Mã lỗi: 400 dữ liệu sai · 401 chưa đăng nhập · 403 sai quyền/không sở hữu · 404 không thấy · 409 vi phạm nghiệp vụ hoặc trùng.
-- Vi phạm quy tắc nghiệp vụ thì `throw` exception riêng (ví dụ `BusinessRuleException` → 409), middleware sẽ map sang mã HTTP. Không trả stack trace.
-- Thời gian lưu UTC (`DATETIME2`). Enum lưu dạng chuỗi (`HasConversion<string>()`).
-- Không hard-code secret: JWT key và connection string đặt trong `appsettings.json` / user-secrets.
-- Phân quyền: `[Authorize(Roles = "Admin")]`. Kiểm tra quyền sở hữu (đội của mình, trận được phân công) ở Service.
-- Thao tác nhiều bảng (kết thúc trận, sinh lịch) phải chạy trong transaction.
+- Đặt tên PascalCase cho class/property, camelCase cho JSON. Request class (Data Annotations) đặt lồng trong controller; response dùng object ẩn danh (`Select(x => new { ... })`), KHÔNG trả Entity ra ngoài.
+- Mọi response dùng chung dạng `{ "success": bool, "message": string, "data": T }` (qua `ApiControllerBase`).
+- API danh sách luôn phân trang `?page=&pageSize=&search=&sortBy=` (mặc định 10, tối đa 50) bằng `PagedQuery`.
+- Mã lỗi: 400 dữ liệu sai · 401 chưa đăng nhập · 403 sai quyền/không sở hữu · 404 không thấy · 409 vi phạm nghiệp vụ hoặc trùng. Trả thẳng từ controller (`Conflict409("...")`...), không trả stack trace.
+- Thời gian lưu `DATETIME2` (giờ địa phương theo ví dụ trong đặc tả, vd `2026-11-07T08:00:00`). Enum lưu dạng chuỗi (`HasConversion<string>()`).
+- Không hard-code secret: JWT key và connection string đặt trong `appsettings.json` / user-secrets (key dev trong repo chỉ để chạy thử).
+- Phân quyền: `[Authorize(Roles = "Admin")]`. Kiểm tra quyền sở hữu (đội của mình, trận được phân công) ngay trong action.
+- Thao tác nhiều bảng (kết thúc trận, sinh lịch) phải nằm trong một lần `SaveChanges`/transaction.
+- Giao diện chỉ là khung HTML + JS gọi API; đăng nhập bằng JWT lưu `localStorage`. Sửa `.cshtml` cần build lại, sửa css/js thì không.
+- Chạy ở Development tự áp migration và nạp dữ liệu mẫu (`Data/Seed/DbSeeder.cs`; tài khoản mẫu ở `docs/requirements.md`).
 - Bảng xếp hạng **không lưu bảng riêng**, mà tính từ các trận `Finished` (view `vw_Standings` hoặc LINQ).
 
 ## Thể thức giải (quan trọng)
@@ -66,7 +61,10 @@ src/FptuCup.Api/
 - Tính điểm: thắng 3, hòa 1, thua 0. Xếp hạng theo: Điểm → Hiệu số → Bàn thắng → Đối đầu.
 - Thẻ phạt: 2 vàng trong 1 trận = đỏ; đỏ = treo 1 trận; tích lũy 3 vàng = treo 1 trận.
 
-Danh sách đầy đủ 22 quy tắc nghiệp vụ (BR01–BR22) nằm ở `docs/requirements.md`, mục 2.5.
+- Giờ đá (`KickoffTime`) lưu theo giờ địa phương Việt Nam (UTC+7); so sánh với "bây giờ" dùng `VietnamTime.Now`.
+- Hạn nộp đội hình = trước giờ đá 1 ngày (BR23). Quá hạn: đội thiếu đội hình bị xử thua 0–3 (ghi `ForfeitTeamId` + `ForfeitReason`), cả hai thiếu thì hủy trận; `ForfeitWorker` tự chạy mỗi phút.
+
+Danh sách đầy đủ 23 quy tắc nghiệp vụ (BR01–BR23) nằm ở `docs/requirements.md`, mục 8.
 Khi viết code cho quy tắc nào, ghi chú mã BR tương ứng trong comment.
 
 ## Vai trò
@@ -93,6 +91,6 @@ dotnet run --project src/FptuCup.Api      # Swagger: https://localhost:<port>/sw
 
 ## Khi làm việc trong repo này
 
-- Làm theo đúng endpoint, DTO và mã lỗi ghi trong `docs/requirements.md`. Thêm endpoint mới thì cập nhật luôn tài liệu.
+- Làm theo đúng endpoint, dữ liệu vào/ra và mã lỗi ghi trong `docs/requirements.md`. Thêm endpoint mới thì cập nhật luôn tài liệu.
 - Không đổi tên bảng/cột so với `schema.sql` nếu chưa hỏi lại.
 - Sau khi sửa, chạy `dotnet build` và đảm bảo không có lỗi trước khi báo xong.

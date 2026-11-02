@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Trận được phân công – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Referee";
+    ViewData["Nav"] = "referee-matches";
+}
+
+<main class="admin-main">
+    <div>
+        <h1>Trận được phân công</h1>
+        <p class="muted">Chỉ cập nhật được trận mình được phân công (BR09).</p>
+    </div>
+
+    <section class="panel">
+        <div id="match-table"><p class="muted">Đang tải…</p></div>
+        <p class="note">Trận chỉ bắt đầu được khi cả hai đội đã nộp đội hình (BR20).</p>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/referee-matches.js" asp-append-version="true"></script>
+}

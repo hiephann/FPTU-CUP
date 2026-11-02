@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Thống kê cầu thủ – FPTU Cup";
+    ViewData["Nav"] = "players";
+}
+
+<div class="container page-head">
+    <p class="breadcrumb-light"><a href="/players">Cầu thủ</a> / <span id="crumb">…</span></p>
+</div>
+
+<main class="container list-page" id="player-root">
+    <section class="card"><p class="muted">Đang tải…</p></section>
+</main>
+
+@section Scripts {
+    <script src="~/js/player-detail.js" asp-append-version="true"></script>
+}

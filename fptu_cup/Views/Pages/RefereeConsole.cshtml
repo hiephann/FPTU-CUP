@@ -1,0 +1,14 @@
+@{
+    ViewData["Title"] = "Bảng điều khiển trận – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Referee";
+    ViewData["Nav"] = "referee-matches";
+}
+
+<main class="admin-main" id="console-root">
+    <p class="muted">Đang tải…</p>
+</main>
+
+@section Scripts {
+    <script src="~/js/referee-console.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,31 @@
+@{
+    ViewData["Title"] = "Duyệt đội – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "teams";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <div>
+            <h1>Duyệt đội</h1>
+            <p class="muted" id="teams-sub"></p>
+        </div>
+        <div class="approved-meter">
+            <span class="display"><span id="approved-count">0</span><small id="approved-max"> / 0</small></span>
+            <span class="note">đội đã duyệt (BR05)</span>
+        </div>
+    </div>
+
+    <div class="banner banner-warn" id="teams-lock" hidden></div>
+    <div class="chips" id="team-filters" role="group" aria-label="Lọc theo trạng thái"></div>
+
+    <section class="panel">
+        <div id="team-table"><p class="muted">Đang tải…</p></div>
+        <p class="note">Đội bị từ chối vẫn giữ dữ liệu nhưng không được xếp lịch. Chỉ duyệt đội có từ 7 đến 14 cầu thủ và không vượt số đội tối đa.</p>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-teams.js" asp-append-version="true"></script>
+}
