@@ -8,8 +8,9 @@ namespace fptu_cup.Data.Seed
     /// Dữ liệu mẫu để chạy thử ngay:
     /// admin / Admin@123, referee1..4 / Referee@123, manager_cntt, manager_kt, ... / Manager@123.
     /// Giải "FPTU Cup 2026" đang Ongoing: 8 đội, 56 trận (14 vòng), vòng 1–3 đã đá xong, vòng 4 sắp đá.
+    /// Giải "FPTU Cup 2025" đã Finished: xem DbSeeder.Cup2025.cs.
     /// </summary>
-    public static class DbSeeder
+    public static partial class DbSeeder
     {
         private static readonly (int No, PlayerPosition Pos)[] Generic =
         {
@@ -114,11 +115,13 @@ namespace fptu_cup.Data.Seed
 
             var teams = new Dictionary<string, Team>();
             var players = new Dictionary<string, List<Player>>();
+            var managers = new Dictionary<string, User>();
             for (var t = 0; t < teamDefs.Length; t++)
             {
                 var d = teamDefs[t];
                 var manager = NewManager(d.Manager, d.Name + " – quản lý", managerHash);
                 db.Users.Add(manager);
+                managers[d.Code] = manager;
                 var team = new Team { Tournament = cup2026, Manager = manager, Name = d.Name, Faculty = d.Faculty, KitColor = d.Kit, Status = TeamStatus.Approved };
                 db.Teams.Add(team);
                 teams[d.Code] = team;
@@ -212,6 +215,9 @@ namespace fptu_cup.Data.Seed
                 new Suspension { Player = players["IT"].First(p => p.ShirtNumber == 14), Tournament = cup2026, Reason = "Thẻ đỏ vòng 3", MatchesRemaining = 1 },
                 new Suspension { Player = players["QT"].First(p => p.ShirtNumber == 4), Tournament = cup2026, Reason = "Thẻ đỏ vòng 3", MatchesRemaining = 1 },
                 new Suspension { Player = kiet, Tournament = cup2026, Reason = "Tích lũy 3 thẻ vàng", MatchesRemaining = 1 });
+
+            // Giải 2025 đã kết thúc: các khoa cũ tham dự lại, cùng người quản lý đội.
+            SeedCup2025(db, cup2025, teamDefs.Select(d => (d.Code, d.Name, d.Faculty, d.Kit)).ToArray(), managers, referees, venueA, venueB);
 
             await db.SaveChangesAsync();
         }
