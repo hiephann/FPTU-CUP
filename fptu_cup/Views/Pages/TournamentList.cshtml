@@ -1,0 +1,34 @@
+@{
+    ViewData["Title"] = "Giải đấu – FPTU Cup";
+    ViewData["Nav"] = "tournaments";
+}
+
+<div class="container page-head">
+    <h1>Giải đấu</h1>
+    <p class="muted">Chọn giải để xem lịch, bảng xếp hạng và đội bóng của giải đó (FR07).</p>
+</div>
+
+<main class="container list-page">
+    <section class="card filter-card">
+        <form class="filter-row" id="filter">
+            <label for="search" class="sr-only">Tìm giải đấu</label>
+            <input class="input" id="search" name="search" placeholder="Tìm theo tên hoặc mùa giải">
+            <label for="status" class="sr-only">Trạng thái</label>
+            <select class="input" id="status" name="status">
+                <option value="">Mọi trạng thái</option>
+                <option value="Registration">Đang mở đăng ký</option>
+                <option value="Ongoing">Đang diễn ra</option>
+                <option value="Finished">Đã kết thúc</option>
+                <option value="Draft">Nháp</option>
+            </select>
+            <button class="btn btn-dark" type="submit">Lọc</button>
+            <span class="note" id="count"></span>
+        </form>
+    </section>
+    <div id="list"></div>
+    <div class="pager" id="pager"></div>
+</main>
+
+@section Scripts {
+    <script src="~/js/tournament-list.js" asp-append-version="true"></script>
+}

@@ -97,6 +97,8 @@ CREATE TABLE dbo.Matches (
         CONSTRAINT CK_Matches_Status CHECK (Status IN (N'Scheduled', N'InProgress', N'Finished', N'Postponed', N'Cancelled')),
     UpdatedBy     INT           NULL     CONSTRAINT FK_Matches_UpdatedBy REFERENCES dbo.Users(Id),
     UpdatedAt     DATETIME2     NULL,
+    ForfeitTeamId INT           NULL     CONSTRAINT FK_Matches_ForfeitTeam REFERENCES dbo.Teams(Id),  -- BR23: đội bị xử thua
+    ForfeitReason NVARCHAR(200) NULL,                                                                  -- BR23: lý do xử thua / hủy trận
     CONSTRAINT CK_Matches_DiffTeams CHECK (HomeTeamId <> AwayTeamId)       -- BR06
 );
 GO

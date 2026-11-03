@@ -1,0 +1,45 @@
+@{
+    ViewData["Title"] = "Bảng xếp hạng – FPTU Cup";
+    ViewData["Nav"] = "standings";
+}
+
+<div class="container page-head">
+    <h1>Bảng xếp hạng</h1>
+    <p class="muted" id="standings-sub">Đang tải…</p>
+</div>
+
+<main class="container list-page">
+    <div class="split">
+        <section class="card split-main">
+            <div class="card-head">
+                <h2 class="section-title">Xếp hạng chung</h2>
+                <span class="note">Thắng 3 · Hòa 1 · Thua 0</span>
+            </div>
+            <div id="standings"></div>
+            <div class="legend legend-form">
+                <span><span class="form"><span class="form-T">T</span></span>Thắng</span>
+                <span><span class="form"><span class="form-H">H</span></span>Hòa</span>
+                <span><span class="form"><span class="form-B">B</span></span>Thua</span>
+                <span>Phong độ: 3 trận gần nhất</span>
+            </div>
+            <p class="note">Xếp hạng theo: Điểm → Hiệu số → Bàn thắng → Đối đầu trực tiếp. Trận hòa giữ nguyên kết quả, không đá luân lưu.</p>
+        </section>
+
+        <aside id="thongke" class="split-side">
+            <section class="card">
+                <h2 class="card-title">Vua phá lưới</h2>
+                <div id="scorers"></div>
+                <p class="note">Chỉ tính bàn thắng không phải phản lưới nhà.</p>
+            </section>
+            <section class="card">
+                <h2 class="card-title">Cầu thủ bị treo giò</h2>
+                <div id="suspensions"></div>
+                <p class="note">Thẻ đỏ: treo 1 trận. Tích lũy 3 thẻ vàng: treo 1 trận.</p>
+            </section>
+        </aside>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/standings.js" asp-append-version="true"></script>
+}

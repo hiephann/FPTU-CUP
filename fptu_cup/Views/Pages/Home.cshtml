@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Trang chủ – FPTU Cup";
+    ViewData["Nav"] = "home";
+}
+
+<section class="hero">
+    <div class="container">
+        <div class="hero-copy">
+            <div class="tag-row" id="hero-tags"></div>
+            <h1 class="hero-title">Giải bóng đá<br>sinh viên <em>FPTU Cup</em></h1>
+            <p class="hero-lead">Một bảng duy nhất, mỗi đội gặp nhau hai lần, đội đứng đầu sau vòng cuối là nhà vô địch. Theo dõi lịch, kết quả và bảng xếp hạng cập nhật sau từng trận.</p>
+            <div class="hero-stats" id="hero-stats"></div>
+        </div>
+        <div class="next-card" id="next-card"><p class="muted">Đang tải…</p></div>
+    </div>
+</section>
+
+<main class="home-main">
+    <section id="lich">
+        <div class="section-head">
+            <h2 class="section-title" id="round-title">Lịch thi đấu</h2>
+            <div class="chips" id="round-chips" role="group" aria-label="Chọn vòng"></div>
+        </div>
+        <div class="match-grid" id="round-matches"></div>
+    </section>
+
+    <div class="split">
+        <section id="bxh" class="card split-main">
+            <div class="card-head">
+                <h2 class="section-title">Bảng xếp hạng</h2>
+                <span class="note">Thắng 3 · Hòa 1 · Thua 0 · <a href="/standings">Xem đầy đủ</a></span>
+            </div>
+            <div id="standings"></div>
+            <p class="note">Xếp hạng theo: Điểm → Hiệu số → Bàn thắng → Đối đầu trực tiếp. Đội dẫn đầu sau vòng cuối vô địch.</p>
+        </section>
+
+        <aside id="thongke" class="split-side">
+            <section class="card">
+                <h2 class="card-title">Vua phá lưới</h2>
+                <div id="scorers"></div>
+            </section>
+            <section class="card">
+                <h2 class="card-title" id="susp-title">Treo giò</h2>
+                <div id="suspensions"></div>
+            </section>
+        </aside>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="~/js/home.js" asp-append-version="true"></script>
+}

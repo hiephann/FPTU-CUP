@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Lịch thi đấu – FPTU Cup";
+    ViewData["Nav"] = "schedule";
+}
+
+<div class="container page-head">
+    <h1>Lịch thi đấu</h1>
+    <p class="muted" id="schedule-sub">Đang tải…</p>
+</div>
+
+<main class="container list-page">
+    <section class="card filter-card">
+        <div class="chips round-chips" id="round-chips" role="group" aria-label="Chọn vòng"></div>
+        <form class="filter-row" method="get" action="/schedule">
+            <input type="hidden" name="round" id="round-input" value="">
+            <label for="team" class="sr-only">Lọc theo đội</label>
+            <select class="input" id="team" name="team"><option value="">Tất cả các đội</option></select>
+            <button class="btn btn-dark" type="submit">Lọc</button>
+            <span class="note" id="match-count"></span>
+        </form>
+    </section>
+    <div id="fixtures"></div>
+</main>
+
+@section Scripts {
+    <script src="~/js/schedule.js" asp-append-version="true"></script>
+}

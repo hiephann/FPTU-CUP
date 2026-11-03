@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Sân thi đấu – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "venues";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <div>
+            <h1>Sân thi đấu</h1>
+            <p class="muted">Sân bóng đá 7 người dùng để xếp lịch (FR15).</p>
+        </div>
+        <button class="btn btn-primary" id="add-venue" type="button">Thêm sân</button>
+    </div>
+
+    <section class="panel">
+        <div id="venue-table"><p class="muted">Đang tải…</p></div>
+        <p class="note">Không xóa được sân đã có trong lịch thi đấu.</p>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-venues.js" asp-append-version="true"></script>
+}
