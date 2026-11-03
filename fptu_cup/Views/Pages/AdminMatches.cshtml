@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Lịch & trận đấu – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "Admin";
+    ViewData["Nav"] = "matches";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <div>
+            <h1>Lịch &amp; trận đấu</h1>
+            <p class="muted" id="matches-sub"></p>
+        </div>
+        <div class="actions">
+            <a class="btn" href="#tao-tran">Thêm trận thủ công</a>
+            <a class="btn btn-primary" href="#sinh-lich">Sinh lịch vòng tròn</a>
+        </div>
+    </div>
+
+    <div class="chips round-chips" id="round-chips" role="group" aria-label="Chọn vòng"></div>
+
+    <section class="panel">
+        <div id="match-table"><p class="muted">Đang tải…</p></div>
+        <p class="note">Một sân không có hai trận trùng khung giờ (mỗi trận 60 phút + 10 phút nghỉ), một đội không đá hai trận trong cùng một ngày (BR07, BR08).</p>
+        <p class="note">Hạn nộp đội hình là trước giờ đá 1 ngày (giờ Việt Nam). Quá hạn: đội thiếu đội hình bị xử thua 0–3, cả hai đội thiếu thì trận bị hủy; hệ thống tự xử lý mỗi phút (BR23).
+            <button class="link-btn" id="process-forfeits" type="button">Xử lý quá hạn ngay</button></p>
+    </section>
+
+    <section class="panel" id="sinh-lich">
+        <h2>Sinh lịch vòng tròn</h2>
+        <form id="generate-form">
+            <div class="form-grid">
+                <div class="field"><label for="g-first">Ngày đá vòng 1</label><input class="input" id="g-first" name="firstKickoff" type="date" required></div>
+                <div class="field"><label for="g-days">Số ngày giữa các vòng</label><input class="input" id="g-days" name="daysBetweenRounds" type="number" min="1" value="7" required></div>
+                <div class="field"><label for="g-times">Khung giờ (cách nhau dấu phẩy)</label><input class="input" id="g-times" name="kickoffTimes" value="08:00, 09:10, 10:20, 11:30" required></div>
+                <div class="field"><label>Sân sử dụng</label><div class="check-row" id="g-venues"></div></div>
+            </div>
+            <p class="note">Dùng thuật toán xoay vòng (circle method); 2 lượt thì lượt về đảo sân nhà/khách. Giải phải ở trạng thái Ongoing, có ít nhất 2 đội được duyệt và chưa có lịch (BR17).</p>
+            <button class="btn btn-primary" type="submit">Sinh lịch</button>
+        </form>
+    </section>
+
+    <section class="panel" id="tao-tran">
+        <h2>Thêm trận thủ công</h2>
+        <form id="create-form">
+            <div class="form-grid">
+                <div class="field"><label for="m-home">Đội nhà</label><select class="input" id="m-home" name="homeTeamId"></select></div>
+                <div class="field"><label for="m-away">Đội khách</label><select class="input" id="m-away" name="awayTeamId"></select></div>
+                <div class="field"><label for="m-round">Vòng</label><input class="input" id="m-round" name="round" type="number" min="1" value="1" required></div>
+                <div class="field"><label for="m-time">Giờ đá</label><input class="input" id="m-time" name="kickoffTime" type="datetime-local" required></div>
+                <div class="field"><label for="m-venue">Sân</label><select class="input" id="m-venue" name="venueId"></select></div>
+                <div class="field"><label for="m-ref">Trọng tài</label><select class="input" id="m-ref" name="refereeId"></select></div>
+            </div>
+            <p class="note">Hai đội phải khác nhau và cùng thuộc giải này (BR06).</p>
+            <button class="btn btn-primary" type="submit">Tạo trận</button>
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/admin-matches.js" asp-append-version="true"></script>
+}

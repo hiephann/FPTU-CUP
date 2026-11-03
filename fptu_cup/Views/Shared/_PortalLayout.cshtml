@@ -1,0 +1,68 @@
+@{
+    // ViewData["Role"]: Admin | TeamManager | Referee – quyết định menu và vai trò được phép vào trang.
+    var role = ViewData["Role"] as string ?? "Admin";
+    var nav = ViewData["Nav"] as string;
+    string Active(string key) => key == nav ? "is-active" : "";
+}
+<!doctype html>
+<html lang="vi">
+<head>
+    <partial name="_Head" />
+</head>
+<body data-portal="@role">
+<div class="admin">
+    <aside class="sidebar">
+        <a class="brand" href="/">
+            <partial name="_BrandMark" />
+            <span class="brand-text">
+                <span class="brand-name">FPTU CUP 2026</span>
+                <span class="brand-sub">@(role == "Admin" ? "Ban tổ chức" : role == "TeamManager" ? "Quản lý đội" : "Trọng tài")</span>
+            </span>
+        </a>
+        <nav class="side-nav" aria-label="Menu">
+            @if (role == "Admin")
+            {
+                <a href="/admin" class="@Active("dashboard")">Tổng quan</a>
+                <a href="/admin/tournaments" class="@Active("tournaments")">Giải đấu</a>
+                <a href="/admin/teams" class="@Active("teams")">Duyệt đội</a>
+                <a href="/admin/matches" class="@Active("matches")">Lịch &amp; trận đấu</a>
+                <a href="/admin/venues" class="@Active("venues")">Sân thi đấu</a>
+                <a href="/admin/users" class="@Active("users")">Tài khoản</a>
+            }
+            else if (role == "TeamManager")
+            {
+                <a href="/manager/team" class="@Active("team")">Đội của tôi</a>
+            }
+            else
+            {
+                <a href="/referee/matches" class="@Active("referee-matches")">Trận được phân công</a>
+            }
+            <a href="/account" class="@Active("account")">Hồ sơ &amp; mật khẩu</a>
+            <a href="/">Xem giải đấu</a>
+        </nav>
+        <a class="side-exit" id="logout-link" href="/login">Đăng xuất</a>
+    </aside>
+
+    <div class="admin-body">
+        <header class="topbar">
+            <div class="inner">
+                <div class="picker" id="tournament-picker">
+                    <span class="note">Giải đang điều hành</span>
+                    <label for="tournament-select" class="sr-only">Chọn giải đấu</label>
+                    <select id="tournament-select"><option>Đang tải…</option></select>
+                </div>
+                <span class="me">
+                    <span class="avatar" id="me-avatar"></span>
+                    <span class="me-text"><b id="me-name"></b><small id="me-role"></small></span>
+                </span>
+            </div>
+        </header>
+        @RenderBody()
+    </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="~/js/app.js" asp-append-version="true"></script>
+<script src="~/js/render.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

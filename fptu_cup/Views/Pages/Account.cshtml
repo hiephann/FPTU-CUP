@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Hồ sơ – FPTU Cup";
+}
+
+<div class="container page-head">
+    <h1>Hồ sơ cá nhân</h1>
+    <p class="muted">Xem thông tin tài khoản và đổi mật khẩu (FR03).</p>
+</div>
+
+<main class="container list-page">
+    <section class="card" id="profile"><p class="muted">Đang tải…</p></section>
+
+    <section class="card">
+        <h2 class="card-title">Đổi mật khẩu</h2>
+        <form id="password-form" novalidate>
+            <div class="form-grid">
+                <div class="field"><label for="old">Mật khẩu hiện tại</label><input class="input" id="old" name="oldPassword" type="password" autocomplete="current-password" required></div>
+                <div class="field"><label for="new">Mật khẩu mới (tối thiểu 8 ký tự)</label><input class="input" id="new" name="newPassword" type="password" autocomplete="new-password" required></div>
+                <div class="field"><label for="confirm">Nhập lại mật khẩu mới</label><input class="input" id="confirm" name="confirm" type="password" autocomplete="new-password" required></div>
+            </div>
+            <div class="banner banner-error" id="password-error" hidden></div>
+            <button class="btn btn-primary" type="submit">Đổi mật khẩu</button>
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/account.js" asp-append-version="true"></script>
+}

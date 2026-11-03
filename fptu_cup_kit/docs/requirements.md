@@ -127,6 +127,19 @@ Mọi endpoint dùng tiền tố /api, trả về JSON theo định dạng thố
 | 35 |  | GET | `/api/tournaments/{id}/top-scorers?top=10` | Vua phá lưới |
 | 36 |  | GET | `/api/tournaments/{id}/suspensions` | Cầu thủ bị treo giò |
 
+Bổ sung khi cài đặt (ngoài 36 API trên):
+
+| Endpoint | Mô tả |
+|---|---|
+| `GET /api/teams/mine` | Các đội do Team Manager đang đăng nhập quản lý (kèm trạng thái giải). |
+| `GET /api/matches?status=&mine=true` | Thêm lọc theo trạng thái và `mine=true` (trận được phân công cho trọng tài đang đăng nhập). |
+| `GET /api/tournaments/{id}/teams` | Admin thấy mọi đội; người khác chỉ thấy đội đã duyệt và đội của mình. Có lọc `status=`. |
+| `GET /api/users?role=` | Admin lọc tài khoản theo vai trò. |
+| `POST /api/matches/process-forfeits` | Admin xử thua / hủy ngay các trận quá hạn nộp đội hình (BR23). Body tùy chọn `{ "asOf": "2026-11-13T09:30:00" }` (giờ VN) để giả lập thời điểm khi demo/test. |
+| `GET /api/matches`, `GET /api/matches/{id}` | Trả thêm `lineupDeadline`, `forfeitTeamId`, `forfeitReason`. `GET /api/matches/{id}/lineups` trả thêm `deadline`, `overdue`. |
+
+Dữ liệu mẫu (chạy ở môi trường Development): `admin / Admin@123`, `referee1..4 / Referee@123`, `manager_cntt`, `manager_kt`, `manager_ai`, `manager_na`, `manager_tk`, `manager_qtkd`, `manager_tt`, `manager_nn` (đội giải đang Ongoing), `manager_ck`, `manager_dt`, `manager_mk`, `manager_luat`, `manager_dl` (đội giải đang Registration), mật khẩu `Manager@123`.
+
 ## 6. Phân quyền API
 
 Phân quyền được cài đặt bằng claim role trong JWT và thuộc tính [Authorize(Roles = "...")]. Các quy tắc sở hữu (đội của mình, trận được phân công) được kiểm tra ở tầng Service.
@@ -160,7 +173,7 @@ ERD: `docs/diagrams/erd.png`. Script: `docs/database/schema.sql`.
 | 03 | Teams | Lưu đội đăng ký tham gia giải gồm Name, Faculty, LogoUrl, KitColor, Status (Pending, Approved, Rejected). Không có bảng Groups vì giải chỉ có một bảng xếp hạng. | Khóa chính: Id. Khóa ngoại: TournamentId → Tournaments, ManagerId → Users. Duy nhất: (TournamentId, Name). |
 | 04 | Players | Lưu cầu thủ của đội gồm StudentCode, FullName, ShirtNumber, Position (GK, DF, MF, FW), DateOfBirth. Mỗi đội có 7–14 cầu thủ. | Khóa chính: Id. Khóa ngoại: TeamId → Teams. Duy nhất: (TeamId, ShirtNumber). |
 | 05 | Venues | Lưu sân bóng đá 7 người gồm Name, Address, Capacity. | Khóa chính: Id. |
-| 06 | Matches | Lưu trận đấu gồm Round, KickoffTime, HomeScore, AwayScore, Status (Scheduled, InProgress, Finished, Postponed, Cancelled), UpdatedBy, UpdatedAt. | Khóa chính: Id. Khóa ngoại: TournamentId, HomeTeamId, AwayTeamId, VenueId, RefereeId, UpdatedBy. Kiểm tra: HomeTeamId ≠ AwayTeamId. |
+| 06 | Matches | Lưu trận đấu gồm Round, KickoffTime, HomeScore, AwayScore, Status (Scheduled, InProgress, Finished, Postponed, Cancelled), UpdatedBy, UpdatedAt, ForfeitTeamId, ForfeitReason (đội bị xử thua và lý do, BR23). KickoffTime lưu giờ địa phương Việt Nam (UTC+7). | Khóa chính: Id. Khóa ngoại: TournamentId, HomeTeamId, AwayTeamId, VenueId, RefereeId, UpdatedBy, ForfeitTeamId. Kiểm tra: HomeTeamId ≠ AwayTeamId. |
 | 07 | MatchLineups | Lưu đội hình mỗi đội nộp cho một trận; IsStarter = 1 với 7 cầu thủ xuất phát, 0 với cầu thủ dự bị. Đội hình bị khóa khi trận bắt đầu. | Khóa chính: Id. Khóa ngoại: MatchId, TeamId, PlayerId. Duy nhất: (MatchId, PlayerId). |
 | 08 | Substitutions | Lưu các lần thay người gồm PlayerOutId, PlayerInId, Minute (1–60). | Khóa chính: Id. Khóa ngoại: MatchId, TeamId, PlayerOutId, PlayerInId → Players. |
 | 09 | Goals | Lưu bàn thắng gồm PlayerId, TeamId (đội được tính bàn thắng), Minute (1–60), IsOwnGoal. | Khóa chính: Id. Khóa ngoại: MatchId, PlayerId, TeamId. |
@@ -195,6 +208,7 @@ Quy ước: khóa chính kiểu INT IDENTITY; thời gian lưu kiểu DATETIME2 
 | BR20 | Đội hình phải nộp trước giờ bóng lăn; trận chỉ được bắt đầu khi cả 2 đội đã có đội hình. Khi trận chuyển InProgress, đội hình bị khóa và không sửa, kể cả khi có thay người. |
 | BR21 | Thay người: cầu thủ ra phải đang trên sân, cầu thủ vào phải là dự bị chưa vào sân; cầu thủ đã bị thay ra không được vào lại; cầu thủ nhận thẻ đỏ không được thay thế. |
 | BR22 | Bàn thắng chỉ được ghi cho cầu thủ đang có mặt trên sân tại phút đó (tính từ đội hình xuất phát và các lần thay người). |
+| BR23 | Hạn nộp đội hình là trước giờ đá 1 ngày (giờ Việt Nam). Quá hạn: đội không nộp bị xử thua 0–3 (trận Finished, ghi `ForfeitTeamId` và `ForfeitReason`, tính điểm như một trận thua/thắng thường); cả hai đội không nộp thì trận bị hủy (Cancelled) kèm lý do. Hệ thống tự xử lý mỗi phút, Admin có thể chạy ngay bằng `POST /api/matches/process-forfeits`. |
 
 ## 9. Đặc tả thiết kế API
 

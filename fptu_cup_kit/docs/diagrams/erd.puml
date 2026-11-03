@@ -73,6 +73,8 @@ entity Matches {
   Status : nvarchar(20)
   UpdatedBy : int <<FK>>
   UpdatedAt : datetime2
+  ForfeitTeamId : int <<FK>>
+  ForfeitReason : nvarchar(200)
 }
 entity MatchLineups {
   * Id : int <<PK>>

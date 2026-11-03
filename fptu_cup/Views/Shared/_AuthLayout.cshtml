@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <partial name="_Head" />
+</head>
+<body>
+@RenderBody()
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="~/js/app.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

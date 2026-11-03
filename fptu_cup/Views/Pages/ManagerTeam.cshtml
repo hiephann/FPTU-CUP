@@ -1,0 +1,34 @@
+@{
+    ViewData["Title"] = "Đội của tôi – FPTU Cup";
+    Layout = "_PortalLayout";
+    ViewData["Role"] = "TeamManager";
+    ViewData["Nav"] = "team";
+}
+
+<main class="admin-main">
+    <div class="row-between" style="align-items:flex-end">
+        <h1>Đội của tôi</h1>
+        <select class="input input-sm" id="team-select" hidden aria-label="Chọn đội"></select>
+    </div>
+
+    <div id="team-area"></div>
+
+    <section class="panel" id="register-panel" hidden>
+        <h2>Đăng ký đội vào giải</h2>
+        <form id="register-team-form">
+            <div class="form-grid">
+                <div class="field"><label for="r-tournament">Giải đang mở đăng ký</label><select class="input" id="r-tournament" name="tournamentId"></select></div>
+                <div class="field"><label for="r-name">Tên đội</label><input class="input" id="r-name" name="name" placeholder="vd. CNTT FC" required></div>
+                <div class="field"><label for="r-faculty">Khoa</label><input class="input" id="r-faculty" name="faculty" placeholder="vd. Information Technology"></div>
+                <div class="field"><label for="r-logo">Logo (URL)</label><input class="input" id="r-logo" name="logoUrl" placeholder="https://..."></div>
+                <div class="field"><label for="r-kit">Màu áo</label><input class="input" id="r-kit" name="kitColor" placeholder="vd. Cam"></div>
+            </div>
+            <p class="note">Đội mới ở trạng thái Pending, chờ ban tổ chức duyệt (cần 7–14 cầu thủ).</p>
+            <button class="btn btn-primary" type="submit">Đăng ký đội</button>
+        </form>
+    </section>
+</main>
+
+@section Scripts {
+    <script src="~/js/manager-team.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Đội bóng – FPTU Cup";
+    ViewData["Nav"] = "teams";
+}
+
+<div class="container page-head">
+    <h1>Đội bóng</h1>
+    <p class="muted" id="teams-sub">Đang tải…</p>
+</div>
+
+<main class="container list-page">
+    <section class="card filter-card">
+        <form class="filter-row" id="filter">
+            <label for="search" class="sr-only">Tìm đội</label>
+            <input class="input" id="search" name="search" placeholder="Tìm theo tên đội hoặc khoa">
+            <button class="btn btn-dark" type="submit">Tìm</button>
+            <span class="note" id="count"></span>
+        </form>
+    </section>
+    <div class="team-grid" id="teams"></div>
+    <div class="pager" id="pager"></div>
+</main>
+
+@section Scripts {
+    <script src="~/js/teams.js" asp-append-version="true"></script>
+}
