@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using fptu_cup.Common;
 using fptu_cup.Data;
+using fptu_cup.Dtos;
 using fptu_cup.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,7 @@ namespace fptu_cup.Controllers
 
             var total = await q.CountAsync();
             var items = await q.OrderBy(v => v.Name).Skip(query.Skip).Take(query.PageSize)
-                .Select(v => new { v.Id, v.Name, v.Address, v.Capacity })
+                .Select(DtoProjections.Venue)
                 .ToListAsync();
             return SuccessPaged(items, total, query);
         }
@@ -37,7 +38,7 @@ namespace fptu_cup.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var v = await _db.Venues.Where(x => x.Id == id).Select(x => new { x.Id, x.Name, x.Address, x.Capacity }).FirstOrDefaultAsync();
+            var v = await _db.Venues.Where(x => x.Id == id).Select(DtoProjections.Venue).FirstOrDefaultAsync();
             return v == null ? NotFound404("Sân không tồn tại") : Success(v);
         }
 
@@ -48,7 +49,7 @@ namespace fptu_cup.Controllers
             var v = new Venue { Name = req.Name.Trim(), Address = req.Address?.Trim(), Capacity = req.Capacity };
             _db.Venues.Add(v);
             await _db.SaveChangesAsync();
-            return Created201(new { v.Id, v.Name, v.Address, v.Capacity }, "Thêm sân thành công");
+            return Created201(v.ToDto(), "Thêm sân thành công");
         }
 
         [Authorize(Roles = "Admin")]
@@ -62,7 +63,7 @@ namespace fptu_cup.Controllers
             v.Address = req.Address?.Trim();
             v.Capacity = req.Capacity;
             await _db.SaveChangesAsync();
-            return Success(new { v.Id, v.Name, v.Address, v.Capacity }, "Cập nhật sân thành công");
+            return Success(v.ToDto(), "Cập nhật sân thành công");
         }
 
         [Authorize(Roles = "Admin")]

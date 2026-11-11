@@ -17,14 +17,14 @@ App.main = async function () {
 
   var fixtures = matches.map(function (m) {
     var done = m.status === 'Finished';
-    return '<div class="fixture"><span class="fx-time">V' + m.round + '</span><span class="fx-home">' + App.esc(m.homeTeam) + '</span>' +
-      '<span class="fx-score' + (done ? '' : ' is-pending') + '">' + (done ? m.homeScore + ' – ' + m.awayScore : 'vs') + '</span><span class="fx-away">' + App.esc(m.awayTeam) + '</span>' +
+    return '<div class="fixture"><span class="fx-time">V' + m.round + '</span><span class="fx-home">' + App.teamLabel(m.homeTeamId, m.homeTeam) + '</span>' +
+      '<span class="fx-score' + (done ? '' : ' is-pending') + '">' + (done ? m.homeScore + ' – ' + m.awayScore : 'vs') + '</span><span class="fx-away">' + App.teamLabel(m.awayTeamId, m.awayTeam) + '</span>' +
       '<span class="fx-meta">' + App.day(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + ' · ' + App.esc(m.venue || 'Chưa có sân') + '</span>' +
       '<span class="fx-link"><a href="/matches/' + m.id + '">Chi tiết</a></span></div>';
   }).join('');
 
   root.innerHTML =
-    '<section class="card team-head">' + App.avatar(t.id, t.name, 'lg') + '<div class="team-head-text"><h2>' + App.esc(t.name) + '</h2>' +
+    '<section class="card team-head">' + App.avatar(t.id, t.name, 'lg') + '<div class="team-head-text"><h2>' + App.esc(t.name) + ' ' + App.teamCode(t.name) + '</h2>' +
     '<p class="muted">' + App.esc(t.tournament) + '</p><div class="chips"><span class="pill pill-chip">Khoa: ' + App.esc(t.faculty || '—') + '</span>' +
     '<span class="pill pill-chip">Màu áo: ' + App.esc(t.kitColor || '—') + '</span><span class="pill pill-chip">Quản lý: ' + App.esc(t.managerName) + '</span></div></div></section>' +
     '<section class="card"><h2 class="card-title">Cầu thủ (' + players.length + ')</h2>' +

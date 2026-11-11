@@ -14,7 +14,44 @@
   --tone-orange-bg: #FDEBE3; --tone-orange-fg: #B5431A;
   --tone-blue-bg: #E6ECF7;   --tone-blue-fg: #1D4F8F;
   --tone-neutral-bg: #EEF1EB; --tone-neutral-fg: #33433B;
+
+  /* ---------- Bootstrap 5: đưa màu/font của tokens.css vào biến --bs-* ---------- */
+  --bs-body-font-family: var(--font-body);
+  --bs-body-bg: var(--color-ground);
+  --bs-body-color: var(--color-ink);
+  --bs-primary: #1F7A4D;
+  --bs-primary-rgb: 31, 122, 77;
+  --bs-link-color: #1F7A4D;
+  --bs-link-color-rgb: 31, 122, 77;
+  --bs-link-hover-color: #145637;
+  --bs-link-hover-color-rgb: 20, 86, 55;
+  --bs-border-color: var(--c-border);
+  --bs-border-radius: 8px;
+  --bs-focus-ring-color: rgba(31, 122, 77, .25);
 }
+
+/* Nút Bootstrap dùng biến --bs-btn-*: đặt theo màu thương hiệu để hover/active/disabled không bị xanh dương mặc định. */
+.btn { --bs-btn-hover-bg: #fff; --bs-btn-active-bg: #fff; --bs-btn-active-color: var(--color-ink); --bs-btn-active-border-color: var(--color-ink-2);
+  --bs-btn-disabled-bg: #fff; --bs-btn-disabled-opacity: .45; --bs-btn-line-height: 1.2; --bs-btn-focus-box-shadow: 0 0 0 .2rem rgba(31, 122, 77, .3); }
+.btn-primary { --bs-btn-color: #fff; --bs-btn-bg: #1F7A4D; --bs-btn-border-color: #1F7A4D; --bs-btn-hover-color: #fff; --bs-btn-hover-bg: #145637;
+  --bs-btn-hover-border-color: #145637; --bs-btn-active-color: #fff; --bs-btn-active-bg: #145637; --bs-btn-active-border-color: #145637;
+  --bs-btn-disabled-color: #fff; --bs-btn-disabled-bg: #1F7A4D; --bs-btn-disabled-border-color: #1F7A4D; }
+.btn-dark { --bs-btn-bg: var(--color-ink); --bs-btn-hover-bg: var(--color-ink-2); --bs-btn-active-bg: var(--color-ink-2); --bs-btn-active-color: #fff; }
+.btn-danger { --bs-btn-color: var(--color-error-fg); --bs-btn-bg: #fff; --bs-btn-border-color: #F0C4C0; --bs-btn-hover-color: var(--color-error-fg);
+  --bs-btn-hover-bg: var(--color-error-bg); --bs-btn-active-color: var(--color-error-fg); --bs-btn-active-bg: var(--color-error-bg); }
+.badge { --bs-badge-color: var(--color-ink); }
+.breadcrumb { margin-bottom: 0; padding: 0; }
+.form-control.input { min-height: 48px; }
+.form-control:focus { border-color: var(--color-accent); box-shadow: 0 0 0 .2rem rgba(31, 122, 77, .2); }
+
+/* Form MVC: thông báo của jQuery Validation Unobtrusive / ModelState */
+.field-validation-valid { display: none; }
+.field-validation-error { font-size: 13px; color: var(--color-error-fg); }
+.input-validation-error, .input-validation-error:focus { border-color: var(--color-loss); }
+.validation-summary-valid { display: none; }
+.validation-summary-errors ul { margin: 0; padding-left: 18px; }
+.small-link { font-size: 14px; }
+.logout-form { margin: 0; }
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -60,6 +97,14 @@ h1, h2 { font-family: var(--font-display); font-weight: 700; text-transform: upp
 .brand-name { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: .02em; }
 .brand-sub { font-size: 12px; color: var(--c-on-dark-2); }
 .main-nav { display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto; }
+/* Navbar Bootstrap: ≥1200px menu nằm ngang, nhỏ hơn thì thu vào nút ☰ (collapse) */
+.site-header .navbar { padding: 0; }
+.site-header .navbar-collapse { gap: 24px; }
+.site-header .navbar-toggler { border-color: rgba(255, 255, 255, .25); }
+@media (max-width: 1199.98px) {
+  .site-header .navbar-collapse { padding-top: 8px; }
+  .site-header .navbar-collapse > .nav-user, .site-header .navbar-collapse > #auth-link { margin-top: 8px; align-self: flex-start; }
+}
 .main-nav a { padding: 10px 14px; border-radius: 8px; color: var(--c-on-dark); font-size: 15px; }
 .main-nav a:hover { color: #fff; text-decoration: none; background: rgba(255, 255, 255, .06); }
 .main-nav a.is-active { background: rgba(255, 255, 255, .1); color: #fff; font-weight: 600; }
@@ -75,6 +120,21 @@ h1, h2 { font-family: var(--font-display); font-weight: 700; text-transform: upp
 .avatar-sm { width: 30px; height: 30px; font-size: 11px; font-family: var(--font-body); }
 .avatar-md { width: 72px; height: 72px; font-size: 28px; }
 .avatar-lg { width: 96px; height: 96px; font-size: 38px; }
+.avatar-xs { width: 22px; height: 22px; font-size: 9px; font-family: var(--font-body); }
+/* Logo đội: ảnh nằm gọn trong vòng tròn nền trắng; ảnh lỗi thì JS bỏ class has-logo để hiện lại chữ viết tắt */
+.avatar { overflow: hidden; }
+.avatar.has-logo { background: #fff; box-shadow: inset 0 0 0 1px var(--color-line); }
+.avatar.has-logo .avatar-code { display: none; }
+.avatar img { width: 100%; height: 100%; object-fit: contain; padding: 8%; display: block; }
+.team-inline { display: inline-flex; align-items: center; gap: 8px; min-width: 0; vertical-align: middle; }
+/* Tên tắt của đội (CNTT, KT…) luôn hiện cạnh logo – phân biệt các đội khi dùng chung logo mặc định */
+.team-code { display: inline-block; padding: 1px 6px; border-radius: 4px; background: var(--c-chip); color: var(--color-ink-2);
+  font-family: var(--font-body); font-size: 11px; font-weight: 700; letter-spacing: .04em; line-height: 1.5; text-transform: uppercase; vertical-align: middle; white-space: nowrap; }
+.team-cell .team-code { margin-right: 2px; }
+.match-hero .team-code, .console-board .team-code { background: rgba(255, 255, 255, .14); color: #fff; font-size: 13px; }
+.versus-team .team-code { font-size: 12px; }
+h2 .team-code { font-size: 14px; letter-spacing: .06em; }
+.fx-home .team-inline { flex-direction: row-reverse; }
 .pill { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 13px; }
 .pill-glass { background: rgba(255, 255, 255, .1); color: var(--c-on-dark); }
 .pill-green { background: var(--color-accent-soft); color: var(--color-accent-dark); font-weight: 600; }
@@ -237,7 +297,12 @@ h1, h2 { font-family: var(--font-display); font-weight: 700; text-transform: upp
 
 /* ---------- Dashboard admin ---------- */
 .admin { min-height: 100vh; background: var(--color-ground); color: var(--color-ink); display: flex; flex-wrap: wrap; }
-.sidebar { flex: 1 1 248px; max-width: 100%; background: var(--color-ink); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+/* Sidebar: ≥992px cột cố định 248px; nhỏ hơn là offcanvas của Bootstrap (mở bằng nút ☰ Menu trên topbar) */
+.sidebar-wrap { --bs-offcanvas-width: 280px; --bs-offcanvas-bg: var(--color-ink); }
+@media (min-width: 992px) { .sidebar-wrap { flex: 0 0 248px; display: flex; position: sticky; top: 0; height: 100vh; } }
+.sidebar { flex: 1 1 auto; width: 100%; min-height: 0; overflow-y: auto; background: var(--color-ink); color: #fff; padding: 24px 16px; display: flex; flex-direction: column; gap: 24px; }
+.sidebar .logout-form { margin-top: auto; }
+.sidebar .side-exit { width: 100%; text-align: left; border: 0; background: none; font: inherit; font-size: 14px; cursor: pointer; }
 .sidebar .brand { padding: 0 8px; }
 .sidebar .brand-name { font-size: 22px; line-height: 1.15; }
 .side-nav { display: flex; flex-direction: column; gap: 2px; }
@@ -308,9 +373,9 @@ input[aria-invalid="true"] { border-color: var(--color-loss); }
 .banner-info { background: var(--color-accent-soft); color: var(--color-accent-dark); }
 .banner-warn { background: var(--color-warn-bg); color: var(--color-warn-fg); }
 .banner-error { background: var(--color-error-bg); color: var(--color-error-fg); }
-.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 18px;
+.app-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 12px 18px;
   border-radius: 10px; background: var(--color-ink); color: #fff; font-size: 14px; box-shadow: 0 8px 24px rgba(16, 32, 26, .25); z-index: 50; }
-.toast[hidden] { display: none; }
+.app-toast[hidden] { display: none; }
 .side-exit { margin-top: auto; padding: 10px 12px; border-radius: 8px; color: var(--c-on-dark-2); font-size: 14px; }
 .side-exit:hover { color: #fff; background: rgba(255, 255, 255, .06); text-decoration: none; }
 .role-links { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -412,7 +477,7 @@ input[aria-invalid="true"] { border-color: var(--color-loss); }
 .admin-main .chips { margin: 0; }
 
 /* ---------- Giao diện gọi API: hộp thoại, toast lỗi, liên kết tiện ích ---------- */
-.toast-error { background: var(--color-error-fg); }
+.app-toast.toast-error { background: var(--color-error-fg); }
 .dialog { border: 0; border-radius: var(--radius-lg); padding: 24px; width: min(440px, calc(100% - 32px)); box-shadow: 0 16px 48px rgba(16, 32, 26, .3); color: var(--color-ink); font-family: var(--font-body); }
 .dialog::backdrop { background: rgba(16, 32, 26, .5); }
 .dialog-form { display: flex; flex-direction: column; gap: 14px; }
@@ -422,7 +487,8 @@ input[aria-invalid="true"] { border-color: var(--color-loss); }
 .demo-accounts { font-size: 14px; border: 1px solid var(--c-border); border-radius: 10px; padding: 10px 14px; background: #fff; }
 .demo-accounts summary { cursor: pointer; font-weight: 600; }
 .demo-accounts ul { margin: 10px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
-.nav-user { display: flex; align-items: center; gap: 12px; }
+.nav-user { display: flex; align-items: center; gap: 12px; white-space: nowrap; flex: none; }
+.btn-header { white-space: nowrap; }
 .nav-user a { color: #fff; font-weight: 600; }
 a.todo { color: inherit; text-decoration: none; }
 a.todo:hover { color: inherit; text-decoration: none; filter: brightness(.97); }

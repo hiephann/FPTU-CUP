@@ -1,0 +1,18 @@
+@{
+    var accounts = new (string Label, string User, string Pass)[]
+    {
+        ("Admin", "admin", "Admin@123"),
+        ("Quản lý đội CNTT FC", "manager_cntt", "Manager@123"),
+        ("Quản lý đội Điện tử FC (đang đăng ký)", "manager_dt", "Manager@123"),
+        ("Trọng tài", "referee1", "Referee@123"),
+    };
+}
+<details class="demo-accounts">
+    <summary>Tài khoản mẫu (dữ liệu seed)</summary>
+    <ul>
+        @foreach (var a in accounts)
+        {
+            <li><b>@a.Label:</b> <button type="button" class="link-btn" data-fill="@a.User|@a.Pass">@a.User / @a.Pass</button></li>
+        }
+    </ul>
+</details>

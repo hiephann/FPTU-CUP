@@ -57,7 +57,7 @@ App.main = async function () {
       return '<div class="lineup-row"><span class="no">' + p.shirtNumber + '</span><span class="nm">' + App.esc(p.name) + '</span>' + App.render.positionBadge(p.position) + '</div>';
     }).join('');
     var bench = team.substitutes.map(function (p) { return p.shirtNumber + ' ' + App.esc(p.name); }).join(' · ');
-    return '<div class="lineup"><span class="lineup-title' + (blue ? ' is-blue' : '') + '">' + App.esc(team.name) + '</span>' +
+    return '<div class="lineup"><span class="lineup-title' + (blue ? ' is-blue' : '') + '">' + App.teamLabel(team.id, team.name) + '</span>' +
       (rows || '<p class="muted">Chưa nộp đội hình.</p>') +
       (team.substitutes.length ? '<span class="bench-title">Dự bị</span><span class="bench">' + bench + '</span>' : '') + '</div>';
   }
@@ -67,15 +67,15 @@ App.main = async function () {
     '<nav class="breadcrumb" aria-label="Đường dẫn"><a href="/schedule">Lịch thi đấu</a><span aria-hidden="true">/</span><span>Vòng ' + m.round +
     '</span><span aria-hidden="true">/</span><span class="current">' + App.esc(home.name) + ' – ' + App.esc(away.name) + '</span></nav>' +
     '<div class="center-row"><span class="status-pill">' + statusText + '</span></div>' +
-    '<div class="scoreboard"><div class="scoreboard-team">' + App.avatar(home.id, home.name, 'lg') + '<h2>' + App.esc(home.name) + '</h2><small>Chủ nhà</small></div>' +
+    '<div class="scoreboard"><div class="scoreboard-team">' + App.avatar(home.id, home.name, 'lg') + App.teamCode(home.name) + '<h2>' + App.esc(home.name) + '</h2><small>Chủ nhà</small></div>' +
     '<div class="scoreboard-score"><strong>' + (showScore ? home.score + '<i>–</i>' + away.score : 'VS') + '</strong>' +
     (showScore && !forfeit ? '<small>Hiệp 1: ' + firstHalf[0] + '–' + firstHalf[1] + '</small>' : '') + '</div>' +
-    '<div class="scoreboard-team">' + App.avatar(away.id, away.name, 'lg') + '<h2>' + App.esc(away.name) + '</h2><small>Đội khách</small></div></div>' +
+    '<div class="scoreboard-team">' + App.avatar(away.id, away.name, 'lg') + App.teamCode(away.name) + '<h2>' + App.esc(away.name) + '</h2><small>Đội khách</small></div></div>' +
     '<div class="hero-meta"><span>Vòng ' + m.round + ' · ' + App.dayLongFull(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + '</span><span>' +
     App.esc(m.venue || 'Chưa có sân') + '</span><span>Trọng tài: ' + App.esc(m.referee || 'Chưa phân công') + '</span></div></div></section>' +
     '<main class="detail-main">' + notice + '<section class="card"><div class="card-head"><h2 class="card-title-md">Diễn biến trận đấu</h2><div class="legend">' +
     '<span>Bàn thắng</span><span><span class="mini-card" aria-hidden="true"></span>Thẻ vàng</span><span>Thay người</span></div></div>' +
-    '<div class="events-head"><span>' + App.esc(home.name) + '</span><span></span><span>' + App.esc(away.name) + '</span></div>' + events + '</section>' +
+    '<div class="events-head"><span>' + App.teamLabel(home.id, home.name) + '</span><span></span><span>' + App.teamLabel(away.id, away.name) + '</span></div>' + events + '</section>' +
     '<section class="card"><h2 class="card-title-md">Đội hình xuất phát</h2><p class="note">Đội hình khi bóng lăn, không thay đổi sau các lần thay người.</p>' +
     '<div class="lineups">' + lineup(home, false) + lineup(away, true) + '</div></section></main>';
 };

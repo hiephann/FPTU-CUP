@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace fptu_cup.Controllers
 {
     /// <summary>Lớp cha của các API controller: lấy user hiện tại và trả JSON theo dạng { success, message, data }.</summary>
+    // Chỉ nhận/trả JSON thường (để formatter của OData không chen media type odata.* vào Swagger của /api).
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public abstract class ApiControllerBase : ControllerBase
     {
         protected int CurrentUserId => int.TryParse(User.FindFirst("sub")?.Value, out var id) ? id : 0;

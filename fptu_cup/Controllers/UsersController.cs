@@ -47,6 +47,7 @@ namespace fptu_cup.Controllers
             return Success(items);
         }
 
+        /// <summary>Tạo tài khoản: mặc định Referee; Admin chọn được mọi vai trò (Admin, Referee, TeamManager).</summary>
         [HttpPost("api/users")]
         public async Task<IActionResult> CreateReferee(CreateRefereeRequest req)
         {
@@ -61,11 +62,24 @@ namespace fptu_cup.Controllers
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.Password),
                 FullName = req.FullName.Trim(),
                 Email = email,
-                Role = UserRole.Referee,
+                Role = req.Role ?? UserRole.Referee,
             };
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
-            return Created201(new { user.Id, user.Username, user.FullName, user.Email, role = user.Role }, "Tạo tài khoản trọng tài thành công");
+            return Created201(new { user.Id, user.Username, user.FullName, user.Email, role = user.Role }, "Tạo tài khoản thành công");
+        }
+
+        /// <summary>Admin đặt lại mật khẩu cho bất kỳ tài khoản nào (không cần mật khẩu cũ).</summary>
+        [HttpPut("api/users/{id:int}/password")]
+        public async Task<IActionResult> ResetPassword(int id, ResetPasswordRequest req)
+        {
+            var user = await _db.Users.FindAsync(id);
+            if (user == null) return NotFound404("Không tìm thấy tài khoản");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
+            user.SecurityStamp = Guid.NewGuid().ToString(); // phiên đăng nhập cũ của người đó hết hiệu lực
+            await _db.SaveChangesAsync();
+            return Success(new { user.Id, user.Username }, "Đã đặt lại mật khẩu");
         }
 
         [HttpPatch("api/users/{id:int}/status")]
@@ -86,6 +100,13 @@ namespace fptu_cup.Controllers
             [Required, MinLength(8)] public string Password { get; set; } = "";
             [Required, StringLength(100)] public string FullName { get; set; } = "";
             [Required, EmailAddress, StringLength(100)] public string Email { get; set; } = "";
+            /// <summary>Bỏ trống = Referee.</summary>
+            public UserRole? Role { get; set; }
+        }
+
+        public class ResetPasswordRequest
+        {
+            [Required, MinLength(8, ErrorMessage = "Mật khẩu mới tối thiểu 8 ký tự")] public string NewPassword { get; set; } = "";
         }
 
         public class SetStatusRequest

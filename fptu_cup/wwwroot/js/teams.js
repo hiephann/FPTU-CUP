@@ -12,7 +12,7 @@ App.main = async function () {
     var d = res.data;
     $('#count').textContent = d.totalCount + ' đội';
     $('#teams').innerHTML = d.items.length ? d.items.map(function (x) {
-      return '<a class="team-card" href="/teams/' + x.id + '">' + App.avatar(x.id, x.name, 'md') + '<b>' + App.esc(x.name) + '</b>' +
+      return '<a class="team-card" href="/teams/' + x.id + '">' + App.avatar(x.id, x.name, 'md') + App.teamCode(x.name) + '<b>' + App.esc(x.name) + '</b>' +
         '<small>' + App.esc(x.faculty || '—') + '</small><small>' + x.playerCount + ' cầu thủ · ' + App.esc(x.managerName) + '</small></a>';
     }).join('') : '<p class="muted">Không có đội nào khớp.</p>';
     $('#pager').innerHTML = App.render.pager(d);

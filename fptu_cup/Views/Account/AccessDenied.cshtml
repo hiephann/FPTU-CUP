@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "Không có quyền – FPTU Cup";
+}
+
+<main class="container list-page py-5">
+    <section class="card">
+        <h1 class="card-title">Không có quyền truy cập</h1>
+        <p class="muted">
+            Tài khoản <b>@User.FullName()</b> (@User.Role()) không được vào trang này.
+            Mỗi khu vực chỉ dành cho một vai trò: Ban tổ chức, Quản lý đội hoặc Trọng tài.
+        </p>
+        <div class="actions">
+            <a class="btn btn-primary" href="@AccountController.HomeFor(User.Role())">Về khu vực của tôi</a>
+            <a class="btn" asp-controller="Account" asp-action="Login">Đăng nhập tài khoản khác</a>
+        </div>
+    </section>
+</main>

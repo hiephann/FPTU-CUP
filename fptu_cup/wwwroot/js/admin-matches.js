@@ -31,7 +31,7 @@ App.main = async function () {
         var lineKind = m.lineupsSubmitted === 2 ? 'ok' : m.lineupsSubmitted === 1 ? 'warn' : 'error';
         var statusKind = m.forfeitReason ? 'warn' : STATUS_BADGE[m.status];
         return '<tr><td class="time">' + App.hhmm(m.kickoffTime) + '</td>' +
-          '<td class="wrap" style="font-weight:600">' + App.esc(m.homeTeam) + (done ? ' <span class="display score-inline">' + m.homeScore + '–' + m.awayScore + '</span> ' : ' <span class="vs">vs</span> ') + App.esc(m.awayTeam) + '</td>' +
+          '<td class="wrap" style="font-weight:600">' + App.teamLabel(m.homeTeamId, m.homeTeam) + (done ? ' <span class="display score-inline">' + m.homeScore + '–' + m.awayScore + '</span> ' : ' <span class="vs">vs</span> ') + App.teamLabel(m.awayTeamId, m.awayTeam) + '</td>' +
           '<td>' + App.esc(m.venue || '—') + '</td><td>' + refSelect + '</td>' +
           '<td>' + (done || m.status === 'Cancelled' ? '' : App.render.statusBadge(lineKind, m.lineupsSubmitted + '/2 đội') + '<br><span class="note">hạn ' + App.hhmmDmy(m.lineupDeadline) + '</span>') + '</td>' +
           '<td class="wrap" title="' + App.esc(m.forfeitReason || '') + '">' + App.render.statusBadge(statusKind, App.matchStatusText(m)) +

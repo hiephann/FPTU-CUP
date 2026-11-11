@@ -21,17 +21,23 @@ App.main = async function () {
   }
 
   function render() {
-    var editable = team.tournamentStatus === 'Registration';
+    // BR04: chỉ sửa cầu thủ khi giải đang Registration – Admin (quyền tối cao) được sửa mọi lúc.
+    var editable = team.tournamentStatus === 'Registration' || App.isAdmin();
     var count = players.length;
     var enough = count >= 7 && count <= 14;
     var percent = Math.min(100, Math.round(count * 100 / 14));
 
     var html =
       '<div class="split"><section class="panel panel-main team-head">' + App.avatar(team.id, team.name, 'lg') +
-      '<div class="team-head-text"><h2>' + App.esc(team.name) + '</h2><p class="muted">' + App.esc(team.tournament) + '</p><div class="chips">' +
+      '<div class="team-head-text"><h2>' + App.esc(team.name) + ' ' + App.teamCode(team.name) + '</h2><p class="muted">' + App.esc(team.tournament) + '</p><div class="chips">' +
       App.render.statusBadge(STATUS_BADGE[team.status], App.TEAM_STATUS[team.status]) +
       '<span class="pill pill-chip">Khoa: ' + App.esc(team.faculty || '—') + '</span><span class="pill pill-chip">Màu áo: ' + App.esc(team.kitColor || '—') + '</span>' +
-      '<button class="btn btn-sm" id="edit-team">Sửa thông tin đội</button></div></div></section>' +
+      '<button class="btn btn-sm" id="edit-team">Sửa thông tin đội</button>' +
+      // Upload logo: PNG/JPG/WEBP/GIF tối đa 1 MB -> POST /api/teams/{id}/logo (multipart)
+      '<label class="btn btn-sm mb-0" for="logo-file">' + (team.logoUrl ? 'Đổi logo' : 'Tải logo lên') + '</label>' +
+      '<input type="file" id="logo-file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>' +
+      (team.logoUrl ? '<button class="btn btn-sm btn-danger" id="delete-logo">Xóa logo</button>' : '') +
+      '</div><span class="note">Logo: PNG, JPG, WEBP hoặc GIF, tối đa 1 MB; nên dùng ảnh vuông.</span></div></section>' +
       '<section class="panel panel-side"><span class="label muted">Số cầu thủ</span><span class="display big-number">' + count + '<small> / 14</small></span>' +
       '<span class="progress"><span style="width:' + percent + '%"></span></span>' +
       (enough ? '<span class="note">Đủ điều kiện (tối thiểu 7, tối đa 14 cầu thủ).</span>' : '<span class="note unassigned">Chưa đủ 7 cầu thủ, đội chưa được duyệt (BR01).</span>') +
@@ -54,7 +60,7 @@ App.main = async function () {
       upcoming.map(function (m) {
         var late = App.vnNow() > new Date(m.lineupDeadline);
         return '<tr><td>Vòng ' + m.round + '</td><td>' + App.day(m.kickoffTime) + ' · <b>' + App.hhmm(m.kickoffTime) + '</b></td><td style="font-weight:600">' +
-          App.esc(m.homeTeam) + ' <span class="vs">vs</span> ' + App.esc(m.awayTeam) + '</td><td>' + App.esc(m.venue || '—') + '</td>' +
+          App.teamLabel(m.homeTeamId, m.homeTeam) + ' <span class="vs">vs</span> ' + App.teamLabel(m.awayTeamId, m.awayTeam) + '</td><td>' + App.esc(m.venue || '—') + '</td>' +
           '<td>' + App.render.statusBadge(m.lineupsSubmitted === 2 ? 'ok' : 'warn', m.lineupsSubmitted + '/2 đội đã nộp') + '</td>' +
           '<td class="' + (late ? 'unassigned' : '') + '">Hạn nộp: ' + App.hhmmDmy(m.lineupDeadline) + (late ? ' (quá hạn)' : '') + '</td>' +
           '<td class="al-right"><a class="btn btn-sm btn-primary" href="/manager/lineup/' + m.id + '">' + (late ? 'Xem' : 'Nộp đội hình') + '</a></td></tr>';
@@ -93,9 +99,33 @@ App.main = async function () {
     loadTeam();
   });
 
+  /** Gửi file logo dạng multipart (không qua App.api vì App.api luôn gửi JSON). */
+  async function uploadLogo(file, teamId) {
+    if (file.size > 1024 * 1024) { App.toast('Logo tối đa 1 MB', 'error'); return false; }
+    var data = new FormData();
+    data.append('file', file);
+    var res = await fetch('/api/teams/' + teamId + '/logo', { method: 'POST', headers: { Authorization: 'Bearer ' + App.token() }, body: data })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, data: j.data, message: j.message }; }); })
+      .catch(function () { return { ok: false, message: 'Không kết nối được máy chủ' }; });
+    if (App.report(res)) { App.setLogo(teamId, res.data.logoUrl); return true; }
+    return false;
+  }
+
+  $('#team-area').addEventListener('change', async function (e) {
+    if (e.target.id === 'logo-file' && e.target.files.length && await uploadLogo(e.target.files[0], team.id)) loadTeams(team.id);
+  });
+
   $('#team-area').addEventListener('click', async function (e) {
     var btn = e.target.closest('button');
     if (!btn || btn.disabled) return;
+
+    if (btn.id === 'delete-logo') {
+      if (await App.confirm('Xóa logo của ' + team.name + '?') && App.report(await App.del('/api/teams/' + team.id + '/logo'))) {
+        App.setLogo(team.id, null);
+        loadTeams(team.id);
+      }
+      return;
+    }
 
     if (btn.id === 'add-player') {
       var v = await App.formDialog({ title: 'Thêm cầu thủ', fields: playerFields(), submitText: 'Thêm' });
@@ -106,10 +136,11 @@ App.main = async function () {
         fields: [
           { name: 'name', label: 'Tên đội', value: team.name, required: true },
           { name: 'faculty', label: 'Khoa', value: team.faculty || '' },
-          { name: 'logoUrl', label: 'Logo (URL)', value: team.logoUrl || '' },
           { name: 'kitColor', label: 'Màu áo', value: team.kitColor || '' },
         ],
       });
+      // Logo đổi bằng nút "Tải logo lên"/"Xóa logo"; gửi kèm logo hiện tại để PUT không xóa mất logo.
+      if (t) t.logoUrl = team.logoUrl || null;
       if (t && App.report(await App.put('/api/teams/' + team.id, t))) loadTeams(team.id);
     } else if (btn.dataset.act) {
       var p = players.filter(function (x) { return x.id === +btn.dataset.id; })[0];
@@ -132,9 +163,15 @@ App.main = async function () {
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       var f = form.elements;
-      var body = { name: f.name.value.trim(), faculty: f.faculty.value.trim() || null, logoUrl: f.logoUrl.value.trim() || null, kitColor: f.kitColor.value.trim() || null };
+      var logo = f.logo.files[0];
+      if (logo && logo.size > 1024 * 1024) { App.toast('Logo tối đa 1 MB', 'error'); return; }
+      var body = { name: f.name.value.trim(), faculty: f.faculty.value.trim() || null, kitColor: f.kitColor.value.trim() || null };
       var res = await App.post('/api/tournaments/' + f.tournamentId.value + '/teams', body);
-      if (App.report(res)) { form.reset(); loadTeams(res.data.id); }
+      if (!App.report(res)) return;
+      // Đội tạo xong mới có id -> upload logo (nếu có chọn) bằng POST /api/teams/{id}/logo
+      if (logo) await uploadLogo(logo, res.data.id);
+      form.reset();
+      loadTeams(res.data.id);
     });
   }
 

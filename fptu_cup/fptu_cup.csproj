@@ -1,14 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>5b56fbd0-030b-4007-b658-6136d5567543</UserSecretsId>
+    <!--
+      Dữ liệu app tự ghi khi chạy (logo upload, email chạy thử) KHÔNG thuộc project:
+      nếu không loại ra, Hot Reload của Visual Studio / dotnet watch thấy file mới trong project
+      và tắt app ngay sau khi upload logo. App vẫn phục vụ ảnh /uploads/... từ ổ đĩa như bình thường.
+    -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);wwwroot\uploads\**;App_Data\**</DefaultItemExcludes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Watch Remove="wwwroot\uploads\**;App_Data\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

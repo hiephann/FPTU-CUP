@@ -1,6 +1,3 @@
-@functions {
-    private string NavClass(string key) => (ViewData["Nav"] as string) == key ? "is-active" : "";
-}
 <!doctype html>
 <html lang="vi">
 <head>
@@ -8,38 +5,14 @@
 </head>
 <body>
 <div class="page">
-    <header class="site-header">
-        <div class="container">
-            <a class="brand" href="/">
-                <partial name="_BrandMark" />
-                <span class="brand-text">
-                    <span class="brand-name">FPTU CUP 2026</span>
-                    <span class="brand-sub">Giải bóng đá sinh viên</span>
-                </span>
-            </a>
-            <nav class="main-nav" aria-label="Điều hướng chính">
-                <a href="/" class="@NavClass("home")">Trang chủ</a>
-                <a href="/schedule" class="@NavClass("schedule")">Lịch thi đấu</a>
-                <a href="/standings" class="@NavClass("standings")">Bảng xếp hạng</a>
-                <a href="/teams" class="@NavClass("teams")">Đội bóng</a>
-                <a href="/players" class="@NavClass("players")">Cầu thủ</a>
-                <a href="/tournaments" class="@NavClass("tournaments")">Giải đấu</a>
-            </nav>
-            <a class="btn btn-header" id="auth-link" href="/login">Đăng nhập</a>
-        </div>
-    </header>
+    <partial name="_Navbar" />
 
     @RenderBody()
 
-    <footer class="site-footer">
-        <div class="container">
-            <span>FPTU Cup · Ban tổ chức giải bóng đá sinh viên</span>
-            <span>Dữ liệu lấy từ API · <a href="/swagger">Swagger</a></span>
-        </div>
-    </footer>
+    <partial name="_Footer" />
 </div>
-<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-<script src="~/js/app.js" asp-append-version="true"></script>
+<partial name="_Toast" />
+<partial name="_CoreScripts" />
 <script src="~/js/render.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

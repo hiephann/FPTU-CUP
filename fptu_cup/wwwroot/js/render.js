@@ -8,7 +8,7 @@
       var gd = s.goalDifference > 0 ? '+' + s.goalDifference : String(s.goalDifference);
       var form = s.form.split('').map(function (f) { return '<span class="form-' + f + '">' + f + '</span>'; }).join('');
       return '<tr><td><span class="rank' + (s.rank === 1 ? ' is-first' : '') + '">' + s.rank + '</span></td>' +
-        '<td class="al-left"><span class="team-cell">' + App.avatar(s.teamId, s.team, 'sm').replace('tone-' + App.tone(s.teamId), 'tone-neutral') + App.esc(s.team) + '</span></td>' +
+        '<td class="al-left"><span class="team-cell">' + App.avatar(s.teamId, s.team, 'sm') + App.teamCode(s.team) + App.esc(s.team) + '</span></td>' +
         '<td>' + s.played + '</td><td>' + s.won + '</td><td>' + s.drawn + '</td><td>' + s.lost + '</td>' +
         '<td>' + s.goalsFor + '</td><td>' + s.goalsAgainst + '</td><td>' + gd + '</td>' +
         '<td class="points">' + s.points + '</td><td><span class="form">' + form + '</span></td></tr>';
@@ -21,8 +21,8 @@
   R.topScorers = function (items) {
     if (!items.length) return '<p class="muted">Chưa có bàn thắng nào.</p>';
     return items.map(function (p) {
-      return '<div class="list-row"><span class="rk">' + p.rank + '</span><span class="who"><b>' + App.esc(p.player) +
-        '</b><small>' + App.esc(p.team) + '</small></span><span class="num">' + p.goals + '</span></div>';
+      return '<div class="list-row"><span class="rk">' + p.rank + '</span>' + App.avatar(p.teamId, p.team, 'sm') + '<span class="who"><b>' + App.esc(p.player) +
+        '</b><small>' + App.teamCode(p.team) + ' ' + App.esc(p.team) + '</small></span><span class="num">' + p.goals + '</span></div>';
     }).join('');
   };
 
@@ -31,7 +31,7 @@
     return items.map(function (s) {
       var red = /đỏ/i.test(s.reason);
       return '<div class="list-row is-plain"><span class="' + (red ? 'card-red' : 'card-yellow') + '" role="img" aria-label="' + (red ? 'Thẻ đỏ' : 'Thẻ vàng') + '"></span>' +
-        '<span class="who"><b>' + App.esc(s.player) + '</b><small>' + App.esc(s.team) + ' · ' + App.esc(s.reason) + '</small></span>' +
+        '<span class="who"><b>' + App.esc(s.player) + '</b><small>' + App.teamLabel(s.teamId, s.team) + ' · ' + App.esc(s.reason) + '</small></span>' +
         '<span class="note">' + s.matchesRemaining + ' trận</span></div>';
     }).join('');
   };
@@ -44,8 +44,8 @@
     return '<a class="match-card is-link" href="/matches/' + m.id + '"' + (m.forfeitReason ? ' title="' + App.esc(m.forfeitReason) + '"' : '') + '>' +
       '<div class="match-card-meta"><span>' + App.day(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + '</span>' +
       '<span class="status' + (done && !m.forfeitTeamId ? '' : ' is-upcoming') + '">' + App.matchStatusText(m) + '</span></div>' +
-      '<div class="match-card-row' + (homeWin ? ' is-winner' : '') + '"><b>' + App.esc(m.homeTeam) + '</b><span class="score">' + (done ? m.homeScore : '–') + '</span></div>' +
-      '<div class="match-card-row' + (awayWin ? ' is-winner' : '') + '"><b>' + App.esc(m.awayTeam) + '</b><span class="score">' + (done ? m.awayScore : '–') + '</span></div>' +
+      '<div class="match-card-row' + (homeWin ? ' is-winner' : '') + '"><b>' + App.teamLabel(m.homeTeamId, m.homeTeam) + '</b><span class="score">' + (done ? m.homeScore : '–') + '</span></div>' +
+      '<div class="match-card-row' + (awayWin ? ' is-winner' : '') + '"><b>' + App.teamLabel(m.awayTeamId, m.awayTeam) + '</b><span class="score">' + (done ? m.awayScore : '–') + '</span></div>' +
       '<div class="match-card-foot">' + App.esc(m.venue || 'Chưa có sân') + '</div></a>';
   };
 

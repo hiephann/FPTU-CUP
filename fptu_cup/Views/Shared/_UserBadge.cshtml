@@ -1,0 +1,9 @@
+@* Người dùng đang đăng nhập (claim trong cookie Identity) *@
+@{
+    var name = User.FullName() ?? "";
+    var initials = string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(w => char.ToUpperInvariant(w[0])));
+}
+<span class="me">
+    <span class="avatar" id="me-avatar">@initials</span>
+    <span class="me-text"><b id="me-name">@name</b><small id="me-role">@User.Role()</small></span>
+</span>

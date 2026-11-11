@@ -21,6 +21,8 @@ CREATE TABLE dbo.Users (
     Role          NVARCHAR(20)  NOT NULL
         CONSTRAINT CK_Users_Role CHECK (Role IN (N'Admin', N'Referee', N'TeamManager')),
     IsActive      BIT           NOT NULL CONSTRAINT DF_Users_IsActive DEFAULT (1),
+    EmailConfirmed BIT          NOT NULL CONSTRAINT DF_Users_EmailConfirmed DEFAULT (1), -- đã xác nhận email qua link
+    SecurityStamp NVARCHAR(64)  NULL,  -- ASP.NET Core Identity: đổi khi đổi mật khẩu/email -> link & phiên cũ hết hiệu lực
     CreatedAt     DATETIME2     NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT (SYSUTCDATETIME())
 );
 GO

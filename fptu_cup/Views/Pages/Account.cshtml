@@ -4,11 +4,28 @@
 
 <div class="container page-head">
     <h1>Hồ sơ cá nhân</h1>
-    <p class="muted">Xem thông tin tài khoản và đổi mật khẩu (FR03).</p>
+    <p class="muted">Xem và sửa thông tin tài khoản, xác nhận email, đổi mật khẩu (FR03).</p>
 </div>
 
 <main class="container list-page">
     <section class="card" id="profile"><p class="muted">Đang tải…</p></section>
+
+    <section class="card">
+        <h2 class="card-title">Sửa thông tin</h2>
+        <form id="profile-form" novalidate>
+            <div class="row g-3">
+                <div class="col-md-6 field"><label for="p-name" class="form-label">Họ và tên</label><input class="form-control input" id="p-name" name="fullName" autocomplete="name" required maxlength="100"></div>
+                <div class="col-md-6 field"><label for="p-email" class="form-label">Email</label><input class="form-control input" id="p-email" name="email" type="email" autocomplete="email" required maxlength="100"></div>
+                <div class="col-md-6 field" id="p-pass-field" hidden>
+                    <label for="p-pass" class="form-label">Mật khẩu hiện tại (bắt buộc khi đổi email)</label>
+                    <input class="form-control input" id="p-pass" name="currentPassword" type="password" autocomplete="current-password">
+                </div>
+            </div>
+            <p class="note mt-2">Đổi email thì cần xác nhận lại qua link gửi tới email mới.</p>
+            <div class="banner banner-error mt-2" id="profile-error" hidden></div>
+            <button class="btn btn-primary mt-3" type="submit">Lưu thông tin</button>
+        </form>
+    </section>
 
     <section class="card">
         <h2 class="card-title">Đổi mật khẩu</h2>
@@ -20,6 +37,7 @@
             </div>
             <div class="banner banner-error" id="password-error" hidden></div>
             <button class="btn btn-primary" type="submit">Đổi mật khẩu</button>
+            <a class="ms-2 small-link" asp-controller="Account" asp-action="ForgotPassword">Quên mật khẩu hiện tại?</a>
         </form>
     </section>
 </main>

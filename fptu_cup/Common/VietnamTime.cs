@@ -11,6 +11,9 @@ namespace fptu_cup.Common
 
         public static DateTime Now => DateTime.UtcNow.AddHours(7);
 
+        /// <summary>Múi giờ cố định UTC+7 (không phụ thuộc tên múi giờ của hệ điều hành).</summary>
+        public static readonly TimeZoneInfo Zone = TimeZoneInfo.CreateCustomTimeZone("Vietnam", TimeSpan.FromHours(7), "Giờ Việt Nam", "Giờ Việt Nam");
+
         public static DateTime LineupDeadline(DateTime kickoff) => kickoff.AddHours(-LineupDeadlineHours);
     }
 }

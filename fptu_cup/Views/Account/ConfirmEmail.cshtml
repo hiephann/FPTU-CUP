@@ -1,0 +1,23 @@
+@model bool
+@{
+    ViewData["Title"] = "Xác nhận email – FPTU Cup";
+}
+
+<main class="container list-page py-5">
+    <section class="card">
+        @if (Model)
+        {
+            <h1 class="card-title">Đã xác nhận email</h1>
+            <p class="muted">Email <b>@ViewData["Email"]</b> đã được xác nhận. Từ giờ có thể dùng email này để lấy lại mật khẩu khi quên.</p>
+        }
+        else
+        {
+            <h1 class="card-title">Link xác nhận không hợp lệ</h1>
+            <p class="muted">Link đã hết hạn (24 giờ), đã được dùng, hoặc email đã đổi sau khi gửi link. Đăng nhập rồi vào trang Hồ sơ để gửi lại email xác nhận.</p>
+        }
+        <div class="actions">
+            <a class="btn btn-primary" asp-controller="Pages" asp-action="Account">Về trang Hồ sơ</a>
+            <a class="btn" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+        </div>
+    </section>
+</main>
