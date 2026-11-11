@@ -59,6 +59,32 @@ namespace fptu_cup.Data.Seed
             new[] { ("IT", "NN", (int?)null, (int?)null), ("KT", "TK", null, null), ("AI", "NA", null, null), ("QT", "TT", null, null) },
         };
 
+        /// <summary>
+        /// Tài khoản Admin bổ sung trong "Seed:ExtraAdmins" (appsettings). Chạy mỗi lần khởi động (cả khi DB đã có dữ liệu):
+        /// tài khoản nào chưa có (theo username hoặc email) thì tạo, đã có thì bỏ qua – không ghi đè mật khẩu.
+        /// </summary>
+        private static async Task SeedExtraAdminsAsync(FptuCupDbContext db, IConfiguration config)
+        {
+            foreach (var a in config.GetSection("Seed:ExtraAdmins").GetChildren())
+            {
+                var username = a["Username"]?.Trim();
+                var email = a["Email"]?.Trim().ToLowerInvariant();
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email)) continue;
+                if (await db.Users.AnyAsync(u => u.Username == username || u.Email == email)) continue;
+
+                db.Users.Add(new User
+                {
+                    Username = username,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(a["Password"] ?? "Admin@123"),
+                    FullName = a["FullName"] ?? username,
+                    Email = email,
+                    Role = UserRole.Admin,
+                    EmailConfirmed = true,
+                });
+            }
+            await db.SaveChangesAsync();
+        }
+
         public static async Task SeedAsync(FptuCupDbContext db, IConfiguration config)
         {
             var section = config.GetSection("Seed:Admin");
@@ -76,6 +102,8 @@ namespace fptu_cup.Data.Seed
                 db.Users.Add(admin);
                 await db.SaveChangesAsync();
             }
+
+            await SeedExtraAdminsAsync(db, config);
 
             if (await db.Tournaments.AnyAsync()) return; // đã có dữ liệu mẫu
 

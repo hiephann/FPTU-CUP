@@ -10,12 +10,37 @@
 
 <main class="container list-page">
     <section class="card filter-card">
-        <form class="filter-row" id="filter">
-            <label for="search" class="sr-only">Tìm cầu thủ</label>
-            <input class="input" id="search" name="search" placeholder="Tên, MSSV hoặc tên đội">
-            <button class="btn btn-dark" type="submit">Tìm</button>
-            <span class="note" id="count"></span>
+        <form id="filter" class="row g-2 align-items-end">
+            <div class="col-12 col-md-5">
+                <label for="search" class="form-label small">Tên, MSSV hoặc tên đội</label>
+                <input class="form-control input" id="search" name="search" placeholder="vd. Nguyễn, HE19, CNTT">
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="position" class="form-label small">Vị trí</label>
+                <select class="form-select input" id="position" name="position">
+                    <option value="">Tất cả</option>
+                    <option value="GK">GK – Thủ môn</option>
+                    <option value="DF">DF – Hậu vệ</option>
+                    <option value="MF">MF – Tiền vệ</option>
+                    <option value="FW">FW – Tiền đạo</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label for="orderBy" class="form-label small">Sắp xếp</label>
+                <select class="form-select input" id="orderBy" name="orderBy">
+                    <option value="FullName">Theo tên</option>
+                    <option value="TeamName">Theo đội</option>
+                    <option value="ShirtNumber">Theo số áo</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-2 d-grid">
+                <button class="btn btn-dark" type="submit">Tìm</button>
+            </div>
         </form>
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+            <span class="note" id="count"></span>
+            <code class="note text-break" id="odata-url" title="Truy vấn OData đang dùng"></code>
+        </div>
     </section>
     <section class="card">
         <div id="player-table"><p class="muted">Đang tải…</p></div>

@@ -17,8 +17,9 @@ App.main = function () {
           var self = u.id === me.id;
           return '<tr><td style="font-weight:600">' + App.esc(u.username) + '</td><td>' + App.esc(u.fullName) + '</td><td>' + App.esc(u.email) + '</td>' +
             '<td>' + ROLE[u.role] + '</td><td>' + App.render.statusBadge(u.isActive ? 'ok' : 'error', u.isActive ? 'Hoạt động' : 'Đã khóa') + '</td>' +
-            '<td class="al-right"><button class="btn btn-sm ' + (u.isActive ? 'btn-danger' : '') + '" data-id="' + u.id + '" data-active="' + (u.isActive ? '0' : '1') + '"' +
-            (self ? ' disabled title="Không thể tự khóa tài khoản của mình"' : '') + '>' + (u.isActive ? 'Khóa' : 'Mở khóa') + '</button></td></tr>';
+            '<td class="al-right"><div class="cell-actions"><button class="btn btn-sm" data-reset="' + u.id + '" data-name="' + App.esc(u.username) + '">Đặt lại mật khẩu</button>' +
+            '<button class="btn btn-sm ' + (u.isActive ? 'btn-danger' : '') + '" data-id="' + u.id + '" data-active="' + (u.isActive ? '0' : '1') + '"' +
+            (self ? ' disabled title="Không thể tự khóa tài khoản của mình"' : '') + '>' + (u.isActive ? 'Khóa' : 'Mở khóa') + '</button></div></td></tr>';
         }).join('') + '</tbody></table></div>'
       : '<p class="muted">Không có tài khoản nào khớp.</p>';
 
@@ -39,6 +40,16 @@ App.main = function () {
   });
 
   $('#user-table').addEventListener('click', async function (e) {
+    var r = e.target.closest('[data-reset]');
+    if (r) {
+      var v = await App.formDialog({
+        title: 'Đặt lại mật khẩu cho ' + r.dataset.name,
+        fields: [{ name: 'newPassword', label: 'Mật khẩu mới (tối thiểu 8 ký tự)', type: 'password', required: true, min: 8 }],
+        submitText: 'Đặt lại',
+      });
+      if (v) App.report(await App.put('/api/users/' + r.dataset.reset + '/password', { newPassword: v.newPassword }));
+      return;
+    }
     var b = e.target.closest('[data-id]');
     if (!b || b.disabled) return;
     var active = b.dataset.active === '1';
@@ -51,7 +62,7 @@ App.main = function () {
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     var f = form.elements;
-    var body = { fullName: f.fullName.value.trim(), username: f.username.value.trim(), email: f.email.value.trim(), password: f.password.value };
+    var body = { role: f.role.value, fullName: f.fullName.value.trim(), username: f.username.value.trim(), email: f.email.value.trim(), password: f.password.value };
     if (App.report(await App.post('/api/users', body))) { form.reset(); load(); }
   });
 

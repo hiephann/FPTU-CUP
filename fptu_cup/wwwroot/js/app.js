@@ -46,18 +46,23 @@
     localStorage.removeItem(USER_KEY);
   };
 
+  /** Xóa JWT rồi đăng xuất cookie Identity (POST /logout qua form [data-logout] nếu có; GET /login cũng tự xóa cookie). */
   App.logout = function () {
     App.clearSession();
-    location.href = '/login';
+    var logoutForm = document.querySelector('form[data-logout]');
+    if (logoutForm) logoutForm.submit(); else location.href = '/login';
   };
 
   App.homeFor = function (role) {
     return role === 'Admin' ? '/admin' : role === 'TeamManager' ? '/manager/team' : role === 'Referee' ? '/referee/matches' : '/';
   };
 
+  /** Admin có quyền tối cao: vào được mọi khu vực (quản lý đội, trọng tài) và thao tác thay. */
+  App.isAdmin = function () { var u = App.user(); return !!u && u.role === 'Admin'; };
+
   App.requireRole = function (role) {
     var u = App.user();
-    if (!App.token() || !u || u.role !== role) {
+    if (!App.token() || !u || (u.role !== role && u.role !== 'Admin')) {
       location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search);
       return false;
     }
@@ -119,7 +124,7 @@
     var el = document.getElementById('toast');
     if (!el) return;
     el.textContent = message;
-    el.className = 'toast' + (kind === 'error' ? ' toast-error' : '');
+    el.className = 'app-toast' +(kind === 'error' ? ' toast-error' : '');
     el.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { el.hidden = true; }, kind === 'error' ? 5200 : 3000);
@@ -211,16 +216,64 @@
     return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
   };
 
-  /** Mã viết tắt trong vòng tròn của đội: chữ cái đầu của các từ (bỏ "FC"), tối đa 3 ký tự. */
+  /** Tên tắt của đội: tên một từ giữ tối đa 4 ký tự (CNTT FC → CNTT), nhiều từ lấy chữ cái đầu, tối đa 3 (Kinh tế FC → KT). */
   App.code = function (name) {
     var words = String(name || '').replace(/\bFC\b/i, '').trim().split(/\s+/).filter(Boolean);
     if (words.length === 0) return '?';
-    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+    if (words.length === 1) return words[0].slice(0, 4).toUpperCase();
     return words.slice(0, 3).map(function (w) { return w[0]; }).join('').toUpperCase();
   };
   App.tone = function (id) { return ['green', 'orange', 'blue', 'neutral'][Math.abs(+id || 0) % 4]; };
+  // ------------------------------------------------------------ Logo đội
+
+  /** teamId -> URL logo, nạp một lần mỗi trang trước App.main (xem loadLogos). */
+  App.logos = {};
+
+  /** Lấy logo mọi đội bằng OData: /odata/Teams?$select=Id,LogoUrl&$filter=LogoUrl ne null (Admin thấy cả đội chưa duyệt). */
+  App.loadLogos = function () {
+    var headers = { Accept: 'application/json' };
+    if (App.token()) headers.Authorization = 'Bearer ' + App.token();
+    function page(url) {
+      return fetch(url, { headers: headers })
+        .then(function (r) { return r.ok ? r.json() : { value: [] }; })
+        .then(function (j) {
+          (j.value || []).forEach(function (t) { App.logos[t.Id] = t.LogoUrl; });
+          return j['@odata.nextLink'] ? page(j['@odata.nextLink']) : true;
+        });
+    }
+    return page('/odata/Teams?$select=Id,LogoUrl&$filter=LogoUrl%20ne%20null').catch(function () { return true; });
+  };
+  App.setLogo = function (id, url) { if (url) App.logos[id] = url; else delete App.logos[id]; };
+
+  /** Logo mặc định cho đội chưa upload logo (đặt file khác vào đường dẫn này để đổi). */
+  App.DEFAULT_LOGO = '/img/default-team-logo.png';
+
+  /** Ảnh logo lỗi: thử logo mặc định, lỗi nốt thì quay về chữ viết tắt. */
+  App.logoError = function (img) {
+    if (img.getAttribute('src') !== App.DEFAULT_LOGO) { img.setAttribute('src', App.DEFAULT_LOGO); return; }
+    img.parentNode.classList.remove('has-logo');
+    img.remove();
+  };
+
+  /**
+   * Biểu tượng đội: logo đã upload, đội chưa có logo thì dùng logo mặc định.
+   * size: xs (22px, cạnh tên đội trong danh sách) | sm | md | lg.
+   */
   App.avatar = function (id, name, size) {
-    return '<span class="avatar avatar-' + (size || 'sm') + ' tone-' + App.tone(id) + '">' + App.esc(App.code(name)) + '</span>';
+    var logo = App.logos[id] || App.DEFAULT_LOGO;
+    return '<span class="avatar avatar-' + (size || 'sm') + ' tone-' + App.tone(id) + ' has-logo" title="' + App.esc(name) + '">' +
+      '<img src="' + App.esc(logo) + '" alt="" loading="lazy" onerror="App.logoError(this)">' +
+      '<span class="avatar-code">' + App.esc(App.code(name)) + '</span></span>';
+  };
+
+  /** Nhãn tên tắt của đội (CNTT, KT…), luôn hiện cạnh logo. */
+  App.teamCode = function (name) {
+    return '<span class="team-code">' + App.esc(App.code(name)) + '</span>';
+  };
+
+  /** Logo nhỏ + tên tắt + tên đội, dùng trong lịch thi đấu, kết quả, thẻ trận, bảng… */
+  App.teamLabel = function (id, name) {
+    return '<span class="team-inline">' + App.avatar(id, name, 'xs') + App.teamCode(name) + '<span>' + App.esc(name) + '</span></span>';
   };
   App.initials = function (name) {
     var w = String(name || '?').trim().split(/\s+/);
@@ -251,14 +304,19 @@
 
   // ------------------------------------------------------------ Khởi tạo layout
 
-  /** Layout công khai: nút Đăng nhập đổi thành tên người dùng + Đăng xuất. */
+  /**
+   * Layout công khai: trạng thái đăng nhập do server render từ cookie Identity (_LoginStatus).
+   * Server coi là chưa đăng nhập (cookie hết hạn) thì bỏ luôn JWT cũ trong localStorage cho khớp.
+   */
   function initPublicNav() {
-    var link = document.getElementById('auth-link');
-    var u = App.user();
-    if (!link || !App.token() || !u) return;
-    link.outerHTML = '<span class="nav-user"><a href="' + App.homeFor(u.role) + '">' + App.esc(u.fullName) + '</a>' +
-      '<button class="btn btn-header" type="button" id="logout-btn">Đăng xuất</button></span>';
-    document.getElementById('logout-btn').addEventListener('click', App.logout);
+    if (document.getElementById('auth-link') && App.token()) App.clearSession();
+  }
+
+  /** Form đăng xuất (POST /logout): xóa JWT trước khi gửi. */
+  function initLogoutForms() {
+    App.$$('form[data-logout]').forEach(function (f) {
+      f.addEventListener('submit', function () { App.clearSession(); });
+    });
   }
 
   /** Layout quản lý: kiểm tra vai trò, hiện thông tin user, chọn giải (Admin). */
@@ -266,11 +324,7 @@
     var role = document.body.dataset.portal;
     if (!App.requireRole(role)) return Promise.resolve(false);
 
-    var u = App.user();
-    App.$('#me-name').textContent = u.fullName;
-    App.$('#me-role').textContent = u.role;
-    App.$('#me-avatar').textContent = App.initials(u.fullName);
-    App.$('#logout-link').addEventListener('click', function (e) { e.preventDefault(); App.logout(); });
+    // Tên, vai trò và nút đăng xuất do server render (_UserBadge, _LogoutForm).
 
     var select = document.getElementById('tournament-select');
     var picker = document.getElementById('tournament-picker');
@@ -295,11 +349,16 @@
 
   App.ready = Promise.resolve(true);
   document.addEventListener('DOMContentLoaded', function () {
+    initLogoutForms();
+    var area;
     if (document.body.dataset.portal) {
-      App.ready = initPortal();
+      area = initPortal();
     } else {
       initPublicNav();
+      area = Promise.resolve(true);
     }
+    // Nạp logo song song với khởi tạo layout; trang chỉ dựng giao diện khi đã có cả hai.
+    App.ready = Promise.all([area, App.loadLogos()]).then(function (r) { return r[0]; });
     App.ready.then(function (ok) {
       if (ok && typeof App.main === 'function') App.main();
     });

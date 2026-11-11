@@ -14,7 +14,7 @@ Dự án được phát triển bằng ASP.NET Core Web API (.NET 8), Entity Fra
 
 | # | Tác nhân | Mô tả |
 |---|---|---|
-| 1 | Admin | Thành viên ban tổ chức. Có toàn quyền quản lý hệ thống: tài khoản người dùng (tạo tài khoản trọng tài, khóa/mở tài khoản), giải đấu, duyệt đội, sân thi đấu, lịch thi đấu, phân công trọng tài và sửa kết quả trận đấu. |
+| 1 | Admin | Thành viên ban tổ chức, **quyền tối cao**: làm được mọi việc của Team Manager và Referee (sửa đội, cầu thủ, nộp đội hình, điều khiển trận) cho bất kỳ đội/trận nào. Có toàn quyền quản lý hệ thống: tài khoản người dùng (tạo tài khoản trọng tài, khóa/mở tài khoản), giải đấu, duyệt đội, sân thi đấu, lịch thi đấu, phân công trọng tài và sửa kết quả trận đấu. |
 | 2 | Team Manager | Đội trưởng hoặc quản lý đội. Đăng ký tài khoản, đăng ký đội vào giải, quản lý danh sách cầu thủ và nộp đội hình xuất phát trước mỗi trận. |
 | 3 | Referee | Trọng tài được phân công bắt trận. Bắt đầu và kết thúc trận, ghi nhận diễn biến trận đấu: bàn thắng, thẻ vàng/thẻ đỏ và thay người. |
 | 4 | Guest | Người dùng không cần đăng nhập. Xem giải đấu, đội bóng, cầu thủ, lịch thi đấu, chi tiết trận đấu, bảng xếp hạng, vua phá lưới và cầu thủ bị treo giò. |
@@ -135,10 +135,40 @@ Bổ sung khi cài đặt (ngoài 36 API trên):
 | `GET /api/matches?status=&mine=true` | Thêm lọc theo trạng thái và `mine=true` (trận được phân công cho trọng tài đang đăng nhập). |
 | `GET /api/tournaments/{id}/teams` | Admin thấy mọi đội; người khác chỉ thấy đội đã duyệt và đội của mình. Có lọc `status=`. |
 | `GET /api/users?role=` | Admin lọc tài khoản theo vai trò. |
+| `POST /api/users` | Thêm trường tùy chọn `role` (Admin, Referee, TeamManager; mặc định Referee). |
+| `PUT /api/users/{id}/password` | Admin đặt lại mật khẩu cho tài khoản bất kỳ: `{ "newPassword": "..." }`. |
+| `POST /api/tournaments/{id}/teams`, `PUT /api/teams/{id}` | Admin gọi được; thêm trường tùy chọn `managerId` (tài khoản TeamManager) để gán người quản lý đội. |
+| `GET /api/teams/mine`, `GET /api/matches?mine=true` | Với Admin trả về mọi đội / mọi trận. |
+| `POST /api/teams/{id}/logo` | Upload logo đội (multipart/form-data, trường `file`): PNG, JPG, WEBP hoặc GIF, tối đa 1 MB, kiểm tra bằng chữ ký file (SVG bị từ chối). Quản lý của đội hoặc Admin. File lưu ở `wwwroot/uploads/logos/team-{id}-{guid}.{ext}`, `LogoUrl` = `/uploads/logos/...`; logo cũ đã upload bị xóa. |
+| `DELETE /api/teams/{id}/logo` | Xóa logo (xóa cả file đã upload). |
+| `POST /api/tournaments/{id}/teams`, `PUT /api/teams/{id}` | `logoUrl` chỉ nhận link `http(s)://...` hoặc `/uploads/logos/...`. |
+| `GET /api/tournaments/{id}/top-scorers` | Trả thêm `teamId` (để hiện logo đội). |
+| `GET /api/auth/me` | Trả thêm `emailConfirmed`. |
+| `PUT /api/auth/me` | Sửa hồ sơ `{ fullName, email, currentPassword }`; đổi email bắt buộc `currentPassword`, email mới chuyển về chưa xác nhận và được gửi link xác nhận. |
+| `POST /api/auth/resend-confirmation` | Gửi lại email xác nhận (link hiệu lực 24 giờ). 409 nếu đã xác nhận. |
+| `POST /api/auth/forgot-password` | `{ email }` – gửi link đặt lại mật khẩu (hiệu lực 30 phút) nếu email thuộc tài khoản đang hoạt động; luôn trả cùng một thông báo (không lộ email đã đăng ký). |
+| `POST /api/auth/reset-password` | `{ userId, token, newPassword }` – đặt mật khẩu mới bằng token trong email; token dùng một lần. |
+
+Tài khoản (bổ sung): đăng ký qua giao diện gửi email xác nhận (vẫn đăng nhập được khi chưa xác nhận); đổi / đặt lại mật khẩu hoặc đổi email làm mới `SecurityStamp` nên link cũ và phiên đăng nhập ở máy khác hết hiệu lực. Trang MVC: `/forgot-password`, `/reset-password`, `/confirm-email`, form sửa hồ sơ ở `/account`. Email gửi qua SMTP cấu hình ở mục `Email` (mật khẩu đặt bằng user-secrets); chưa cấu hình thì email được ghi thành file `.eml` trong `fptu_cup/App_Data/mails` để chạy thử.
 | `POST /api/matches/process-forfeits` | Admin xử thua / hủy ngay các trận quá hạn nộp đội hình (BR23). Body tùy chọn `{ "asOf": "2026-11-13T09:30:00" }` (giờ VN) để giả lập thời điểm khi demo/test. |
 | `GET /api/matches`, `GET /api/matches/{id}` | Trả thêm `lineupDeadline`, `forfeitTeamId`, `forfeitReason`. `GET /api/matches/{id}/lineups` trả thêm `deadline`, `overdue`. |
 
-Dữ liệu mẫu (chạy ở môi trường Development): `admin / Admin@123`, `referee1..4 / Referee@123`, `manager_cntt`, `manager_kt`, `manager_ai`, `manager_na`, `manager_tk`, `manager_qtkd`, `manager_tt`, `manager_nn` (đội giải đang Ongoing), `manager_ck`, `manager_dt`, `manager_mk`, `manager_luat`, `manager_dl` (đội giải đang Registration), mật khẩu `Manager@123`.
+OData (chỉ đọc, không cần đăng nhập, trả DTO theo chuẩn OData chứ không theo dạng `{ success, message, data }`). Hỗ trợ `$filter`, `$orderby`, `$select`, `$expand`, `$top` (tối đa 50), `$skip`, `$count`; enum lọc bằng chuỗi (`Status eq 'Finished'`), giờ đá xuất kèm `+07:00`.
+
+| Endpoint | Mô tả |
+|---|---|
+| `GET /odata/$metadata` | Mô hình dữ liệu (EDM) |
+| `GET /odata/Tournaments`, `/odata/Tournaments({id})` | Giải đấu, kèm số đội đã duyệt |
+| `GET /odata/Teams`, `/odata/Teams({id})` | Đội (khách chỉ thấy đội đã duyệt, Admin thấy tất cả); `$expand=Players` |
+| `GET /odata/Players`, `/odata/Players({id})` | Cầu thủ của đội đã duyệt (trang Cầu thủ dùng để tìm theo tên/MSSV/đội, lọc vị trí, sắp xếp) |
+| `GET /odata/Matches`, `/odata/Matches({id})` | Lịch và kết quả |
+| `GET /odata/Venues`, `/odata/Venues({id})` | Sân thi đấu |
+
+Ví dụ: `/odata/Players?$filter=TournamentId eq 1 and contains(FullName,'an') and Position eq 'FW'&$orderby=TeamName&$top=12&$count=true`.
+
+Giao diện MVC (không thuộc API): `GET/POST /login`, `GET/POST /register`, `POST /logout`, `GET /access-denied` dùng ASP.NET Core Identity (cookie) trên bảng `Users`. Đăng nhập thành công cấp cookie để chặn trang `/admin/*` (Admin), `/manager/*` (TeamManager), `/referee/*` (Referee), `/account` (đã đăng nhập), đồng thời cấp JWT cho JS gọi `/api`.
+
+Dữ liệu mẫu (chạy ở môi trường Development): `admin / Admin@123`, `hoangtung / Admin@123` (Admin bổ sung, khai báo ở `Seed:ExtraAdmins` trong appsettings, được tạo mỗi lần khởi động nếu chưa có), `referee1..4 / Referee@123`, `manager_cntt`, `manager_kt`, `manager_ai`, `manager_na`, `manager_tk`, `manager_qtkd`, `manager_tt`, `manager_nn` (đội giải đang Ongoing), `manager_ck`, `manager_dt`, `manager_mk`, `manager_luat`, `manager_dl` (đội giải đang Registration), mật khẩu `Manager@123`.
 
 ## 6. Phân quyền API
 
@@ -150,17 +180,19 @@ Phân quyền được cài đặt bằng claim role trong JWT và thuộc tính
 | 2 | Quản lý tài khoản | X |  |  |  |
 | 3 | Xem giải đấu, đội bóng, cầu thủ | X | X | X | X |
 | 4 | Tạo / sửa / xóa giải đấu, chuyển trạng thái | X |  |  |  |
-| 5 | Đăng ký đội, sửa thông tin đội mình |  |  | X |  |
+| 5 | Đăng ký đội, sửa thông tin đội mình | X (mọi đội) |  | X |  |
 | 6 | Duyệt / từ chối đội | X |  |  |  |
-| 7 | Thêm / sửa / xóa cầu thủ của đội mình |  |  | X |  |
+| 7 | Thêm / sửa / xóa cầu thủ của đội mình | X (mọi đội) |  | X |  |
 | 8 | Quản lý sân, xem danh sách trọng tài | X |  |  |  |
 | 9 | Xem lịch thi đấu, chi tiết trận, đội hình | X | X | X | X |
 | 10 | Tạo trận, sinh lịch, đổi lịch | X |  |  |  |
-| 11 | Nộp đội hình của đội mình |  |  | X |  |
-| 12 | Bắt đầu / kết thúc trận, ghi bàn thắng, thẻ, thay người |  | Trận được phân công |  |  |
+| 11 | Nộp đội hình của đội mình | X (mọi đội) |  | X |  |
+| 12 | Bắt đầu / kết thúc trận, ghi bàn thắng, thẻ, thay người | X (mọi trận) | Trận được phân công |  |  |
 | 13 | Hoãn / hủy trận, sửa kết quả | X |  |  |  |
 | 14 | Xem bảng xếp hạng, vua phá lưới, treo giò | X | X | X | X |
 | 15 | Tổng quan giải | X |  |  |  |
+
+Admin là quyền tối cao: không bị chặn bởi kiểm tra sở hữu (đội của mình, trận được phân công), được bỏ qua BR04 (sửa đội/cầu thủ, đăng ký đội ngoài trạng thái Registration) và hạn nộp đội hình BR23 (khi trận còn Scheduled). Các quy tắc giữ toàn vẹn dữ liệu vẫn áp dụng cho cả Admin: 7–14 cầu thủ, số áo/MSSV không trùng, đội hình 7 người có 1 GK, đội hình khóa khi trận bắt đầu, chỉ ghi diễn biến khi trận InProgress, phút 1–60, thứ tự trạng thái trận; sửa kết quả trận đã kết thúc dùng `PUT /api/matches/{id}/result`.
 
 ## 7. Cơ sở dữ liệu
 
@@ -168,7 +200,7 @@ ERD: `docs/diagrams/erd.png`. Script: `docs/database/schema.sql`.
 
 | STT | Bảng | Mô tả | Khóa & ràng buộc |
 |---|---|---|---|
-| 01 | Users | Lưu tài khoản người dùng gồm Id, Username, PasswordHash, FullName, Email, Role, IsActive, CreatedAt. Role ∈ {Admin, Referee, TeamManager}. | Khóa chính: Id. Duy nhất: Username, Email. |
+| 01 | Users | Lưu tài khoản người dùng gồm Id, Username, PasswordHash, FullName, Email, Role, IsActive, EmailConfirmed, SecurityStamp, CreatedAt. Role ∈ {Admin, Referee, TeamManager}. | Khóa chính: Id. Duy nhất: Username, Email. |
 | 02 | Tournaments | Lưu giải đấu gồm Name, Season, StartDate, EndDate, MaxTeams, NumberOfLegs (1 hoặc 2), Status (Draft, Registration, Ongoing, Finished), CreatedBy. | Khóa chính: Id. Khóa ngoại: CreatedBy → Users. Kiểm tra: EndDate ≥ StartDate. |
 | 03 | Teams | Lưu đội đăng ký tham gia giải gồm Name, Faculty, LogoUrl, KitColor, Status (Pending, Approved, Rejected). Không có bảng Groups vì giải chỉ có một bảng xếp hạng. | Khóa chính: Id. Khóa ngoại: TournamentId → Tournaments, ManagerId → Users. Duy nhất: (TournamentId, Name). |
 | 04 | Players | Lưu cầu thủ của đội gồm StudentCode, FullName, ShirtNumber, Position (GK, DF, MF, FW), DateOfBirth. Mỗi đội có 7–14 cầu thủ. | Khóa chính: Id. Khóa ngoại: TeamId → Teams. Duy nhất: (TeamId, ShirtNumber). |
@@ -180,7 +212,7 @@ ERD: `docs/diagrams/erd.png`. Script: `docs/database/schema.sql`.
 | 10 | Cards | Lưu thẻ phạt gồm PlayerId, CardType (Yellow, Red), Minute (1–60). | Khóa chính: Id. Khóa ngoại: MatchId, PlayerId. |
 | 11 | Suspensions | Lưu án treo giò được sinh tự động khi trận kết thúc, gồm Reason và MatchesRemaining. | Khóa chính: Id. Khóa ngoại: PlayerId, TournamentId. |
 
-Quy ước: khóa chính kiểu INT IDENTITY; thời gian lưu kiểu DATETIME2 theo UTC; bảng xếp hạng không lưu mà tính từ các trận đã kết thúc qua view vw_Standings. Tạo index cho mọi khóa ngoại và cho Players.StudentCode, Matches.KickoffTime.
+Quy ước: khóa chính kiểu INT IDENTITY; thời gian lưu kiểu DATETIME2 theo giờ địa phương Việt Nam (UTC+7), so sánh với `VietnamTime.Now`; bảng xếp hạng không lưu mà tính từ các trận đã kết thúc qua view vw_Standings. Tạo index cho mọi khóa ngoại và cho Players.StudentCode, Matches.KickoffTime.
 
 ## 8. Quy tắc nghiệp vụ (BR)
 
@@ -199,7 +231,7 @@ Quy ước: khóa chính kiểu INT IDENTITY; thời gian lưu kiểu DATETIME2 
 | BR11 | Tỉ số trận phải khớp với số bàn thắng đã ghi (kể cả phản lưới nhà). |
 | BR12 | Tính điểm: thắng 3, hòa 1, thua 0. Trận hòa giữ nguyên kết quả, không đá hiệp phụ hay luân lưu. |
 | BR13 | Xếp hạng theo thứ tự: Điểm → Hiệu số → Bàn thắng → Đối đầu trực tiếp. |
-| BR14 | 2 thẻ vàng trong một trận = 1 thẻ đỏ. Thẻ đỏ: treo giò 1 trận kế tiếp. Tích lũy 3 thẻ vàng: treo giò 1 trận. |
+| BR14 | 2 thẻ vàng trong một trận = 1 thẻ đỏ. Thẻ đỏ: treo giò 1 trận kế tiếp. Tích lũy 3 thẻ vàng (ở 3 trận khác nhau): treo giò 1 trận; 2 thẻ vàng trong cùng một trận đã tính thành thẻ đỏ nên không cộng vào tích lũy. |
 | BR15 | Trận đã Finished chỉ Admin được sửa; mọi thay đổi ghi lại người sửa và thời điểm. |
 | BR16 | Trạng thái trận: Scheduled → InProgress → Finished, hoặc Scheduled → Postponed / Cancelled. |
 | BR17 | Vòng tròn một bảng duy nhất: mỗi đội gặp tất cả đội còn lại. Đá 2 lượt thì mỗi cặp gặp nhau 2 lần, đảo sân nhà/khách; với n đội có 2×(n−1) vòng đấu. Đội đứng đầu bảng khi kết thúc giải là vô địch. |

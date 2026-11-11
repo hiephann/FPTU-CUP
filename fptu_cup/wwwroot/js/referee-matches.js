@@ -18,7 +18,7 @@ App.main = async function () {
       var live = m.status === 'InProgress';
       var scheduled = m.status === 'Scheduled';
       return '<tr><td class="time">' + m.round + '</td><td>' + App.day(m.kickoffTime) + ' · <b>' + App.hhmm(m.kickoffTime) + '</b></td>' +
-        '<td style="font-weight:600">' + App.esc(m.homeTeam) + (done || live ? ' <span class="display score-inline">' + m.homeScore + '–' + m.awayScore + '</span> ' : ' <span class="vs">vs</span> ') + App.esc(m.awayTeam) + '</td>' +
+        '<td style="font-weight:600">' + App.teamLabel(m.homeTeamId, m.homeTeam) + (done || live ? ' <span class="display score-inline">' + m.homeScore + '–' + m.awayScore + '</span> ' : ' <span class="vs">vs</span> ') + App.teamLabel(m.awayTeamId, m.awayTeam) + '</td>' +
         '<td>' + App.esc(m.venue || '—') + '</td><td>' + (done ? '' : App.render.statusBadge(m.lineupsSubmitted === 2 ? 'ok' : 'warn', m.lineupsSubmitted + '/2 đội')) + '</td>' +
         '<td>' + App.render.statusBadge(done || m.status === 'Cancelled' ? 'neutral' : 'ok', App.matchStatusText(m)) + '</td>' +
         '<td class="al-right">' + (scheduled || live

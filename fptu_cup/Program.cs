@@ -7,11 +7,17 @@ using System.Text.Unicode;
 using fptu_cup.Common;
 using fptu_cup.Data;
 using fptu_cup.Data.Seed;
+using fptu_cup.Dtos;
+using fptu_cup.Entities;
+using fptu_cup.Identity;
 using fptu_cup.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OData.UriParser;
 using Microsoft.OpenApi.Models;
 
 namespace fptu_cup
@@ -42,6 +48,15 @@ namespace fptu_cup
                                 e => e.Value!.Errors.Select(x => string.IsNullOrEmpty(x.ErrorMessage) ? "Giá trị không hợp lệ" : x.ErrorMessage).ToArray());
                         return new BadRequestObjectResult(ApiResponse<object>.Fail("Dữ liệu không hợp lệ", errors));
                     };
+                })
+                // OData (chỉ đọc) ở /odata: $filter, $orderby, $select, $expand, $top, $skip, $count trên các DTO.
+                .AddOData(o =>
+                {
+                    o.Select().Filter().OrderBy().Expand().Count().SetMaxTop(50);
+                    o.TimeZone = VietnamTime.Zone; // KickoffTime lưu giờ VN -> xuất kèm +07:00
+                    o.AddRouteComponents("odata", ODataModel.Build(), services =>
+                        // Cho phép lọc enum bằng chuỗi: $filter=Status eq 'Finished'
+                        services.AddSingleton<ODataUriResolver>(new StringAsEnumResolver { EnableCaseInsensitive = true }));
                 });
 
             // Giữ nguyên ký tự tiếng Việt trong HTML
@@ -53,13 +68,49 @@ namespace fptu_cup
             // Xử thua các trận quá hạn nộp đội hình (BR23)
             builder.Services.AddHostedService<ForfeitWorker>();
 
+            // ASP.NET Core Identity cho giao diện MVC: dùng bảng Users có sẵn (AppUserStore), mật khẩu BCrypt,
+            // đăng nhập bằng cookie; trang /admin, /manager, /referee chặn bằng [Authorize(Roles = ...)].
+            builder.Services
+                .AddIdentityCore<User>(o =>
+                {
+                    o.Password.RequiredLength = 8;
+                    o.Password.RequireDigit = false;
+                    o.Password.RequireLowercase = false;
+                    o.Password.RequireUppercase = false;
+                    o.Password.RequireNonAlphanumeric = false;
+                    o.User.RequireUniqueEmail = true;
+                    o.Tokens.EmailConfirmationTokenProvider = AccountEmailService.ConfirmProvider;
+                })
+                .AddUserStore<AppUserStore>()
+                .AddSignInManager()
+                .AddClaimsPrincipalFactory<AppClaimsPrincipalFactory>()
+                .AddErrorDescriber<VietnameseIdentityErrorDescriber>()
+                .AddDefaultTokenProviders() // token đặt lại mật khẩu
+                .AddTokenProvider<EmailConfirmationTokenProvider>(AccountEmailService.ConfirmProvider);
+            builder.Services.AddScoped<IPasswordHasher<User>, BcryptPasswordHasher>();
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = AccountEmailService.ResetLifespan);
+
+            // Email: quên mật khẩu, xác nhận email. SMTP đọc từ mục "Email" (mật khẩu đặt bằng user-secrets).
+            builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+            builder.Services.AddScoped<IAppEmailSender, SmtpEmailSender>();
+            builder.Services.AddScoped<AccountEmailService>();
+
             // JWT: đọc Jwt:Issuer, Jwt:Audience, Jwt:Key từ appsettings / user-secrets
             var jwtKey = builder.Configuration["Jwt:Key"] ?? "";
             if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
                 throw new InvalidOperationException("Jwt:Key phải có tối thiểu 32 ký tự (đặt trong appsettings / user-secrets).");
 
+            // Scheme mặc định chọn theo đường dẫn: /api, /odata dùng JWT Bearer; các trang MVC dùng cookie Identity.
+            const string smartScheme = "JwtOrCookie";
             builder.Services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddAuthentication(smartScheme)
+                .AddPolicyScheme(smartScheme, "JWT cho API, cookie cho trang", o =>
+                {
+                    o.ForwardDefaultSelector = ctx =>
+                        ctx.Request.Path.StartsWithSegments("/api") || ctx.Request.Path.StartsWithSegments("/odata")
+                            ? JwtBearerDefaults.AuthenticationScheme
+                            : IdentityConstants.ApplicationScheme;
+                })
                 .AddJwtBearer(o =>
                 {
                     o.MapInboundClaims = false; // giữ nguyên tên claim: sub, name, role
@@ -85,7 +136,19 @@ namespace fptu_cup
                         },
                         OnForbidden = ctx => WriteError(ctx.HttpContext, HttpStatusCode.Forbidden, "Bạn không có quyền thực hiện thao tác này"),
                     };
-                });
+                })
+                .AddIdentityCookies();
+            builder.Services.ConfigureApplicationCookie(o =>
+            {
+                o.LoginPath = "/login";
+                o.LogoutPath = "/logout";
+                o.AccessDeniedPath = "/access-denied";
+                o.ReturnUrlParameter = "next";
+                o.Cookie.Name = ".FptuCup.Auth";
+                // Hết hạn cùng lúc với JWT mà giao diện dùng để gọi API.
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(builder.Configuration.GetValue("Jwt:ExpiresInMinutes", 60));
+                o.SlidingExpiration = false;
+            });
             builder.Services.AddAuthorization();
 
             // Swagger có nút Authorize để nhập JWT
@@ -120,6 +183,7 @@ namespace fptu_cup
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseODataRouteDebug(); // /$odata: liệt kê các route OData
 
                 // Môi trường dev: tự áp migration và nạp dữ liệu mẫu để chạy được ngay.
                 using var scope = app.Services.CreateScope();

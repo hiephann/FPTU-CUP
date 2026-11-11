@@ -30,8 +30,9 @@ namespace fptu_cup.Controllers
             if (mine)
             {
                 if (User.Identity?.IsAuthenticated != true) return Error(401, "Cần đăng nhập");
+                // Trọng tài: trận được phân công; Admin: mọi trận (vào bàn trọng tài thay).
                 var me = CurrentUserId;
-                q = q.Where(m => m.RefereeId == me);
+                if (!IsAdmin) q = q.Where(m => m.RefereeId == me);
             }
             if (tournamentId != null) q = q.Where(m => m.TournamentId == tournamentId);
             if (round != null) q = q.Where(m => m.Round == round);
@@ -346,11 +347,16 @@ namespace fptu_cup.Controllers
                 });
             }
 
-            foreach (var g in cards.Where(c => c.CardType == CardType.Yellow).GroupBy(c => c.PlayerId))
+            // Tích lũy 3 vàng: chỉ đếm thẻ vàng ở các trận cầu thủ nhận đúng 1 vàng.
+            // 2 vàng trong cùng một trận đã thành thẻ đỏ (treo 1 trận) nên không cộng vào tích lũy (BR14).
+            foreach (var g in cards.Where(c => c.CardType == CardType.Yellow).GroupBy(c => c.PlayerId).Where(g => g.Count() == 1))
             {
-                var before = await _db.Cards.CountAsync(c => c.PlayerId == g.Key && c.CardType == CardType.Yellow
-                    && c.MatchId != match.Id && c.Match!.TournamentId == match.TournamentId && c.Match.Status == MatchStatus.Finished);
-                if ((before + g.Count()) / 3 > before / 3)
+                var before = await _db.Cards
+                    .Where(c => c.PlayerId == g.Key && c.CardType == CardType.Yellow && c.MatchId != match.Id
+                        && c.Match!.TournamentId == match.TournamentId && c.Match.Status == MatchStatus.Finished)
+                    .GroupBy(c => c.MatchId)
+                    .CountAsync(x => x.Count() == 1);
+                if ((before + 1) % 3 == 0)
                 {
                     _db.Suspensions.Add(new Suspension
                     {

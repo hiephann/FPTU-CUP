@@ -8,7 +8,7 @@
 <main class="admin-main">
     <div>
         <h1>Tài khoản</h1>
-        <p class="muted">Tạo tài khoản trọng tài, khóa hoặc mở khóa tài khoản (FR04).</p>
+        <p class="muted">Tạo tài khoản (mọi vai trò), đặt lại mật khẩu, khóa hoặc mở khóa tài khoản (FR04).</p>
     </div>
 
     <section class="panel">
@@ -30,15 +30,22 @@
     </section>
 
     <section class="panel">
-        <h2>Tạo tài khoản trọng tài</h2>
+        <h2>Tạo tài khoản</h2>
         <form id="referee-form">
             <div class="form-grid">
+                <div class="field"><label for="u-role">Vai trò</label>
+                    <select class="input" id="u-role" name="role">
+                        <option value="Referee">Trọng tài</option>
+                        <option value="TeamManager">Quản lý đội</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
                 <div class="field"><label for="u-name">Họ và tên</label><input class="input" id="u-name" name="fullName" required></div>
                 <div class="field"><label for="u-user">Tên đăng nhập</label><input class="input" id="u-user" name="username" required minlength="3"></div>
                 <div class="field"><label for="u-email">Email</label><input class="input" id="u-email" name="email" type="email" required></div>
                 <div class="field"><label for="u-pass">Mật khẩu (tối thiểu 8 ký tự)</label><input class="input" id="u-pass" name="password" type="password" required minlength="8"></div>
             </div>
-            <button class="btn btn-primary" type="submit">Tạo trọng tài</button>
+            <button class="btn btn-primary" type="submit">Tạo tài khoản</button>
         </form>
     </section>
 </main>

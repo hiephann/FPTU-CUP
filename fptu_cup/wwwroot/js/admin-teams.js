@@ -34,12 +34,13 @@ App.main = function () {
         var pending = x.status === 'Pending';
         var full = approved >= t.maxTeams && x.status !== 'Approved';
         var why = !enough ? 'Cần 7–14 cầu thủ (BR01)' : full ? 'Đã đủ số đội tối đa (BR05)' : '';
-        return '<tr><td><span class="team-cell">' + App.avatar(x.id, x.name, 'sm') + App.esc(x.name) + '</span></td><td>' + App.esc(x.faculty || '—') + '</td><td>' + App.esc(x.managerName) + '</td>' +
+        return '<tr><td><span class="team-cell">' + App.avatar(x.id, x.name, 'sm') + App.teamCode(x.name) + App.esc(x.name) + '</span></td><td>' + App.esc(x.faculty || '—') + '</td><td>' + App.esc(x.managerName) + '</td>' +
           '<td><span class="' + (enough ? '' : 'unassigned') + '">' + x.playerCount + '</span>' + (enough ? '' : '<br><span class="note">Chưa đủ 7 cầu thủ (BR01)</span>') + '</td>' +
           '<td>' + App.render.statusBadge(BADGE[x.status], App.TEAM_STATUS[x.status]) + '</td>' +
           '<td class="al-right"><div class="cell-actions">' +
           '<button class="btn btn-sm btn-primary" data-act="approve" data-id="' + x.id + '"' + (open && x.status !== 'Approved' && enough && !full ? '' : ' disabled') + (why ? ' title="' + why + '"' : '') + '>Duyệt</button>' +
           '<button class="btn btn-sm btn-danger" data-act="reject" data-id="' + x.id + '"' + (open && pending ? '' : ' disabled') + '>Từ chối</button>' +
+          '<a class="btn btn-sm" href="/manager/team?team=' + x.id + '" title="Sửa thông tin đội và cầu thủ">Quản lý</a>' +
           '</div></td></tr>';
       }).join('') + '</tbody></table></div>';
   }

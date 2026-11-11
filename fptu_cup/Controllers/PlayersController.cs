@@ -29,13 +29,13 @@ namespace fptu_cup.Controllers
             return Success(items);
         }
 
-        [Authorize(Roles = "TeamManager")]
+        [Authorize(Roles = "TeamManager,Admin")]
         [HttpPost("api/teams/{teamId:int}/players")]
         public async Task<IActionResult> Add(int teamId, PlayerRequest req)
         {
             var team = await _db.Teams.Include(t => t.Tournament).FirstOrDefaultAsync(t => t.Id == teamId);
             if (team == null) return NotFound404("Đội không tồn tại");
-            if (team.ManagerId != CurrentUserId) return Forbidden403("Đội không do bạn quản lý");
+            if (!IsAdmin && team.ManagerId != CurrentUserId) return Forbidden403("Đội không do bạn quản lý");
 
             var error = await CheckPlayerRules(team, req, null);
             if (error != null) return error;
@@ -56,15 +56,16 @@ namespace fptu_cup.Controllers
             return Created201(new { player.Id, player.TeamId, player.StudentCode, player.FullName, player.ShirtNumber, player.Position }, "Thêm cầu thủ thành công");
         }
 
-        [Authorize(Roles = "TeamManager")]
+        [Authorize(Roles = "TeamManager,Admin")]
         [HttpPut("api/players/{id:int}")]
         public async Task<IActionResult> Update(int id, PlayerRequest req)
         {
             var player = await _db.Players.Include(p => p.Team!.Tournament).FirstOrDefaultAsync(p => p.Id == id);
             if (player == null) return NotFound404("Cầu thủ không tồn tại");
-            if (player.Team!.ManagerId != CurrentUserId) return Forbidden403("Cầu thủ không thuộc đội bạn quản lý");
+            var team = player.Team!; // luôn có nhờ Include ở trên
+            if (!IsAdmin && team.ManagerId != CurrentUserId) return Forbidden403("Cầu thủ không thuộc đội bạn quản lý");
 
-            var error = await CheckPlayerRules(player.Team, req, id);
+            var error = await CheckPlayerRules(team, req, id);
             if (error != null) return error;
 
             player.StudentCode = req.StudentCode.Trim().ToUpperInvariant();
@@ -76,18 +77,19 @@ namespace fptu_cup.Controllers
             return Success(new { player.Id, player.TeamId, player.StudentCode, player.FullName, player.ShirtNumber, player.Position }, "Cập nhật cầu thủ thành công");
         }
 
-        [Authorize(Roles = "TeamManager")]
+        [Authorize(Roles = "TeamManager,Admin")]
         [HttpDelete("api/players/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             var player = await _db.Players.Include(p => p.Team!.Tournament).FirstOrDefaultAsync(p => p.Id == id);
             if (player == null) return NotFound404("Cầu thủ không tồn tại");
-            if (player.Team!.ManagerId != CurrentUserId) return Forbidden403("Cầu thủ không thuộc đội bạn quản lý");
-            if (player.Team.Tournament!.Status != TournamentStatus.Registration)
+            var team = player.Team!; // luôn có nhờ Include ở trên
+            if (!IsAdmin && team.ManagerId != CurrentUserId) return Forbidden403("Cầu thủ không thuộc đội bạn quản lý");
+            if (!IsAdmin && team.Tournament!.Status != TournamentStatus.Registration)
                 return Conflict409("Chỉ sửa danh sách cầu thủ khi giải ở trạng thái Registration (BR04)");
 
             var count = await _db.Players.CountAsync(p => p.TeamId == player.TeamId);
-            if (player.Team.Status == TeamStatus.Approved && count <= 7)
+            if (team.Status == TeamStatus.Approved && count <= 7)
                 return Conflict409("Đội đã được duyệt phải còn tối thiểu 7 cầu thủ (BR01)");
             if (await _db.MatchLineups.AnyAsync(l => l.PlayerId == id) || await _db.Goals.AnyAsync(g => g.PlayerId == id)
                 || await _db.Cards.AnyAsync(c => c.PlayerId == id))
@@ -140,10 +142,10 @@ namespace fptu_cup.Controllers
             });
         }
 
-        /// <summary>BR02 (MSSV duy nhất trong giải), BR03 (số áo duy nhất trong đội), BR04 (chỉ khi Registration).</summary>
+        /// <summary>BR02 (MSSV duy nhất trong giải), BR03 (số áo duy nhất trong đội), BR04 (chỉ khi Registration – Admin được bỏ qua).</summary>
         private async Task<IActionResult?> CheckPlayerRules(Team team, PlayerRequest req, int? playerId)
         {
-            if (team.Tournament!.Status != TournamentStatus.Registration)
+            if (!IsAdmin && team.Tournament!.Status != TournamentStatus.Registration)
                 return Conflict409("Chỉ sửa danh sách cầu thủ khi giải ở trạng thái Registration (BR04)");
 
             var code = req.StudentCode.Trim().ToUpperInvariant();

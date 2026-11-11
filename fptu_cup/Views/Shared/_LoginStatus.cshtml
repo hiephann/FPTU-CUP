@@ -1,0 +1,12 @@
+@* Trạng thái đăng nhập trên header công khai, đọc từ cookie Identity (server render, không cần JS). *@
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="nav-user">
+        <a href="@AccountController.HomeFor(User.Role())">@User.FullName()</a>
+        <partial name="_LogoutForm" model="@("btn btn-header")" />
+    </div>
+}
+else
+{
+    <a class="btn btn-header" id="auth-link" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+}

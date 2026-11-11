@@ -1,0 +1,41 @@
+@model string
+@* Model: vai trò của khu vực (Admin | TeamManager | Referee). Màn hình nhỏ: menu là offcanvas của Bootstrap. *@
+<aside class="sidebar-wrap offcanvas-lg offcanvas-start" tabindex="-1" id="portal-sidebar" aria-label="Menu quản lý">
+    <div class="sidebar">
+        <div class="d-flex align-items-center justify-content-between gap-2">
+            <a class="brand" asp-controller="Pages" asp-action="Home">
+                <partial name="_BrandMark" />
+                <span class="brand-text">
+                    <span class="brand-name">FPTU CUP 2026</span>
+                    <span class="brand-sub">@(Model == "Admin" ? "Ban tổ chức" : Model == "TeamManager" ? "Quản lý đội" : "Trọng tài")</span>
+                </span>
+            </a>
+            <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas"
+                    data-bs-target="#portal-sidebar" aria-label="Đóng menu"></button>
+        </div>
+        <nav class="side-nav">
+            @if (Model == "Admin")
+            {
+                <a nav-key="dashboard" asp-controller="Pages" asp-action="AdminDashboard">Tổng quan</a>
+                <a nav-key="tournaments" asp-controller="Pages" asp-action="AdminTournaments">Giải đấu</a>
+                <a nav-key="teams" asp-controller="Pages" asp-action="AdminTeams">Duyệt đội</a>
+                <a nav-key="matches" asp-controller="Pages" asp-action="AdminMatches">Lịch &amp; trận đấu</a>
+                <a nav-key="venues" asp-controller="Pages" asp-action="AdminVenues">Sân thi đấu</a>
+                <a nav-key="users" asp-controller="Pages" asp-action="AdminUsers">Tài khoản</a>
+                <a nav-key="team" asp-controller="Pages" asp-action="ManagerTeam">Đội &amp; cầu thủ (thay quản lý)</a>
+                <a nav-key="referee-matches" asp-controller="Pages" asp-action="RefereeMatches">Bàn trọng tài (mọi trận)</a>
+            }
+            else if (Model == "TeamManager")
+            {
+                <a nav-key="team" asp-controller="Pages" asp-action="ManagerTeam">Đội của tôi</a>
+            }
+            else
+            {
+                <a nav-key="referee-matches" asp-controller="Pages" asp-action="RefereeMatches">Trận được phân công</a>
+            }
+            <a nav-key="account" asp-controller="Pages" asp-action="Account">Hồ sơ &amp; mật khẩu</a>
+            <a asp-controller="Pages" asp-action="Home">Xem giải đấu</a>
+        </nav>
+        <partial name="_LogoutForm" model="@("side-exit")" />
+    </div>
+</aside>

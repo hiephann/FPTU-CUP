@@ -1,0 +1,28 @@
+<header class="site-header">
+    <nav class="navbar navbar-expand-xl navbar-dark" aria-label="Điều hướng chính">
+        <div class="container">
+            <a class="brand" asp-controller="Pages" asp-action="Home">
+                <partial name="_BrandMark" />
+                <span class="brand-text">
+                    <span class="brand-name">FPTU CUP 2026</span>
+                    <span class="brand-sub">Giải bóng đá sinh viên</span>
+                </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav"
+                    aria-controls="main-nav" aria-expanded="false" aria-label="Mở menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="main-nav">
+                <div class="main-nav navbar-nav">
+                    <a nav-key="home" asp-controller="Pages" asp-action="Home">Trang chủ</a>
+                    <a nav-key="schedule" asp-controller="Pages" asp-action="Schedule">Lịch thi đấu</a>
+                    <a nav-key="standings" asp-controller="Pages" asp-action="Standings">Bảng xếp hạng</a>
+                    <a nav-key="teams" asp-controller="Pages" asp-action="Teams">Đội bóng</a>
+                    <a nav-key="players" asp-controller="Pages" asp-action="Players">Cầu thủ</a>
+                    <a nav-key="tournaments" asp-controller="Pages" asp-action="TournamentList">Giải đấu</a>
+                </div>
+                <partial name="_LoginStatus" />
+            </div>
+        </div>
+    </nav>
+</header>

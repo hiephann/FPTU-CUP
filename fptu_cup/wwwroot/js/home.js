@@ -40,9 +40,9 @@ App.main = async function () {
     $('#next-card').innerHTML =
       '<div class="row-between"><span class="eyebrow">Trận tiếp theo</span><span class="note">Vòng ' + nextMatch.round + ' · ' +
       App.dayLong(nextMatch.kickoffTime) + ' · ' + App.hhmm(nextMatch.kickoffTime) + '</span></div>' +
-      '<div class="versus"><div class="versus-team">' + App.avatar(nextMatch.homeTeamId, nextMatch.homeTeam, 'md') + '<b>' + App.esc(nextMatch.homeTeam) +
+      '<div class="versus"><div class="versus-team">' + App.avatar(nextMatch.homeTeamId, nextMatch.homeTeam, 'md') + App.teamCode(nextMatch.homeTeam) + '<b>' + App.esc(nextMatch.homeTeam) +
       '</b><small>' + teamInfo(nextMatch.homeTeamId) + '</small></div><span class="versus-vs">VS</span>' +
-      '<div class="versus-team">' + App.avatar(nextMatch.awayTeamId, nextMatch.awayTeam, 'md') + '<b>' + App.esc(nextMatch.awayTeam) +
+      '<div class="versus-team">' + App.avatar(nextMatch.awayTeamId, nextMatch.awayTeam, 'md') + App.teamCode(nextMatch.awayTeam) + '<b>' + App.esc(nextMatch.awayTeam) +
       '</b><small>' + teamInfo(nextMatch.awayTeamId) + '</small></div></div>' +
       '<div class="info-strip"><span>' + App.esc(nextMatch.venue || 'Chưa có sân') + '</span><span>Trọng tài: ' + App.esc(nextMatch.referee || 'Chưa phân công') + '</span>' +
       '<span>Hạn nộp đội hình: ' + App.hhmmDmy(nextMatch.lineupDeadline) + '</span></div>' +

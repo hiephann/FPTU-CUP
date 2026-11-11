@@ -123,7 +123,7 @@ namespace fptu_cup.Controllers
                 .Select(g => new { PlayerId = g.Key, Matches = g.Count() })
                 .ToDictionaryAsync(x => x.PlayerId, x => x.Matches);
             var players = await _db.Players.Where(p => playerIds.Contains(p.Id))
-                .Select(p => new { p.Id, p.FullName, p.ShirtNumber, Team = p.Team!.Name })
+                .Select(p => new { p.Id, p.FullName, p.ShirtNumber, p.TeamId, Team = p.Team!.Name })
                 .ToDictionaryAsync(p => p.Id);
 
             var result = goals
@@ -131,13 +131,14 @@ namespace fptu_cup.Controllers
                 {
                     playerId = g.PlayerId,
                     player = players[g.PlayerId].FullName,
+                    teamId = players[g.PlayerId].TeamId,
                     team = players[g.PlayerId].Team,
                     goals = g.Goals,
                     matches = appearances.GetValueOrDefault(g.PlayerId),
                 })
                 .OrderByDescending(x => x.goals).ThenBy(x => x.matches).ThenBy(x => x.player)
                 .Take(top)
-                .Select((x, i) => new { rank = i + 1, x.playerId, x.player, x.team, x.goals, x.matches })
+                .Select((x, i) => new { rank = i + 1, x.playerId, x.player, x.teamId, x.team, x.goals, x.matches })
                 .ToList();
             return Success(result);
         }

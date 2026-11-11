@@ -50,7 +50,7 @@ namespace fptu_cup.Controllers
         /// Đúng 7 cầu thủ xuất phát, đúng 1 thủ môn, dự bị tối đa 7, không ai bị treo giò (BR19);
         /// chỉ nộp được khi trận còn Scheduled – sau đó đội hình bị khóa (BR20).
         /// </summary>
-        [Authorize(Roles = "TeamManager")]
+        [Authorize(Roles = "TeamManager,Admin")]
         [HttpPut("{teamId:int}")]
         public async Task<IActionResult> Submit(int id, int teamId, LineupRequest req)
         {
@@ -59,11 +59,11 @@ namespace fptu_cup.Controllers
             if (teamId != match.HomeTeamId && teamId != match.AwayTeamId) return BadRequest400("Đội không tham gia trận này");
 
             var team = await _db.Teams.FindAsync(teamId);
-            if (team == null || team.ManagerId != CurrentUserId) return Forbidden403("Đội không do bạn quản lý");
+            if (team == null || (!IsAdmin && team.ManagerId != CurrentUserId)) return Forbidden403("Đội không do bạn quản lý");
             if (match.Status != MatchStatus.Scheduled) return Conflict409("Trận đã bắt đầu hoặc đã đóng, đội hình bị khóa (BR20)");
 
             var deadline = VietnamTime.LineupDeadline(match.KickoffTime);
-            if (VietnamTime.Now > deadline)
+            if (!IsAdmin && VietnamTime.Now > deadline) // Admin nộp thay được cả khi quá hạn (trận vẫn Scheduled)
                 return Conflict409($"Đã quá hạn nộp đội hình ({deadline:HH:mm dd/MM/yyyy}); đội không nộp sẽ bị xử thua (BR23)");
 
             var starters = req.Starters.Distinct().ToList();

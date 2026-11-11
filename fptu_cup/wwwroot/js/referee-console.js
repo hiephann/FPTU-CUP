@@ -49,7 +49,7 @@ App.main = async function () {
     var live = m.status === 'InProgress';
     var scheduled = m.status === 'Scheduled';
     var finished = m.status === 'Finished';
-    var assigned = m.refereeId === me.id;
+    var assigned = m.refereeId === me.id || App.isAdmin(); // Admin điều khiển được mọi trận
     var home = m.homeTeam, away = m.awayTeam;
     var bothLineups = home.lineupSubmitted && away.lineupSubmitted;
 
@@ -68,10 +68,10 @@ App.main = async function () {
       '<div class="row-between" style="align-items:flex-end"><div><span class="eyebrow">Vòng ' + m.round + '</span><h1>Bảng điều khiển trận</h1>' +
       '<p class="muted">' + App.dayLongFull(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + ' · ' + App.esc(m.venue || 'Chưa có sân') + '</p></div>' +
       '<a class="btn" href="/referee/matches">Danh sách trận</a></div>' +
-      '<section class="console-board"><div class="console-team">' + App.avatar(home.id, home.name, 'md') + '<b>' + App.esc(home.name) + '</b></div>' +
+      '<section class="console-board"><div class="console-team">' + App.avatar(home.id, home.name, 'md') + App.teamCode(home.name) + '<b>' + App.esc(home.name) + '</b></div>' +
       '<div class="console-score"><span class="display">' + home.score + '</span><i>–</i><span class="display">' + away.score + '</span>' +
       '<span class="status-pill" data-status="' + m.status + '">' + App.MATCH_STATUS[m.status] + '</span></div>' +
-      '<div class="console-team">' + App.avatar(away.id, away.name, 'md') + '<b>' + App.esc(away.name) + '</b></div>' +
+      '<div class="console-team">' + App.avatar(away.id, away.name, 'md') + App.teamCode(away.name) + '<b>' + App.esc(away.name) + '</b></div>' +
       '<div class="console-actions"><button class="btn btn-primary" id="btn-start"' + (scheduled && bothLineups ? '' : ' disabled') + '>Bắt đầu trận</button>' +
       '<button class="btn btn-dark" id="btn-finish"' + (live ? '' : ' disabled') + '>Kết thúc trận</button></div></section>' +
       hint + '<div class="banner banner-error" id="console-error" hidden></div>' +

@@ -46,9 +46,9 @@ App.main = async function () {
       var awayWin = done && m.awayScore > m.homeScore;
       var note = m.forfeitTeamId ? ' · xử thua' : m.status === 'Postponed' ? ' (hoãn)' : m.status === 'Cancelled' ? ' (hủy)' : '';
       return '<div class="fixture"><span class="fx-time">' + App.hhmm(m.kickoffTime) + '</span>' +
-        '<span class="fx-home' + (homeWin ? ' is-winner' : '') + '">' + App.esc(m.homeTeam) + '</span>' +
+        '<span class="fx-home' + (homeWin ? ' is-winner' : '') + '">' + App.teamLabel(m.homeTeamId, m.homeTeam) + '</span>' +
         '<span class="fx-score' + (done ? '' : ' is-pending') + '">' + (done ? m.homeScore + ' – ' + m.awayScore : 'vs') + '</span>' +
-        '<span class="fx-away' + (awayWin ? ' is-winner' : '') + '">' + App.esc(m.awayTeam) + '</span>' +
+        '<span class="fx-away' + (awayWin ? ' is-winner' : '') + '">' + App.teamLabel(m.awayTeamId, m.awayTeam) + '</span>' +
         '<span class="fx-meta">' + App.esc(m.venue || 'Chưa có sân') + ' · ' + App.esc(m.referee || 'Chưa phân công trọng tài') + note + '</span>' +
         '<span class="fx-link"><a href="/matches/' + m.id + '">Chi tiết</a></span></div>';
     }).join('');

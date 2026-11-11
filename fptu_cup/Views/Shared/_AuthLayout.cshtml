@@ -5,8 +5,8 @@
 </head>
 <body>
 @RenderBody()
-<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-<script src="~/js/app.js" asp-append-version="true"></script>
+<partial name="_Toast" />
+<partial name="_CoreScripts" />
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -36,7 +36,7 @@ App.main = async function () {
     $('#round-table').innerHTML = '<div class="table-scroll"><table class="tbl tbl-left"><thead><tr><th>Giờ</th><th>Trận đấu</th><th>Sân</th><th>Trọng tài</th><th>Đội hình</th><th><span class="sr-only">Thao tác</span></th></tr></thead><tbody>' +
       matches.map(function (m) {
         var kind = m.lineupsSubmitted === 2 ? 'ok' : m.lineupsSubmitted === 1 ? 'warn' : 'error';
-        return '<tr><td class="time">' + App.hhmm(m.kickoffTime) + '</td><td style="font-weight:600">' + App.esc(m.homeTeam) + ' <span class="vs">vs</span> ' + App.esc(m.awayTeam) + '</td>' +
+        return '<tr><td class="time">' + App.hhmm(m.kickoffTime) + '</td><td style="font-weight:600">' + App.teamLabel(m.homeTeamId, m.homeTeam) + ' <span class="vs">vs</span> ' + App.teamLabel(m.awayTeamId, m.awayTeam) + '</td>' +
           '<td>' + App.esc(m.venue || '—') + '</td><td>' + (m.referee ? App.esc(m.referee) : '<span class="unassigned">Chưa phân công</span>') + '</td>' +
           '<td>' + App.render.statusBadge(kind, m.lineupsSubmitted + '/2 đội') + '</td>' +
           '<td class="al-right"><a class="btn btn-sm" href="/admin/matches?round=' + m.round + '">Quản lý</a></td></tr>';

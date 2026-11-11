@@ -1,0 +1,71 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký quản lý đội – FPTU Cup";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth">
+    <section class="auth-aside">
+        <a class="brand" asp-controller="Pages" asp-action="Home">
+            <partial name="_BrandMark" />
+            <span class="brand-name">FPTU CUP 2026</span>
+        </a>
+
+        <ol class="steps">
+            <li><b>1. Tạo tài khoản</b><span>Đăng ký với vai trò quản lý đội (Team Manager).</span></li>
+            <li><b>2. Đăng ký đội</b><span>Khi giải mở đăng ký, khai báo tên đội, khoa, logo và màu áo.</span></li>
+            <li><b>3. Thêm cầu thủ</b><span>Mỗi đội cần từ 7 đến 14 cầu thủ trước khi ban tổ chức duyệt.</span></li>
+            <li><b>4. Nộp đội hình</b><span>Chọn 7 cầu thủ xuất phát (1 thủ môn) trước mỗi trận.</span></li>
+        </ol>
+
+        <div>
+            <h1 class="auth-title">Lập đội<br>ra sân</h1>
+            <p class="auth-lead">Tài khoản Admin và trọng tài do ban tổ chức cấp, chỉ quản lý đội mới tự đăng ký.</p>
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <form class="auth-form" id="register-form" asp-controller="Account" asp-action="Register" method="post">
+            <div class="field">
+                <h2>Đăng ký</h2>
+                <p class="muted">Tạo tài khoản quản lý đội để đăng ký đội vào giải.</p>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="banner banner-error" role="alert"></div>
+
+            <div class="field">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control input" autocomplete="name" placeholder="vd. Nguyễn Văn A">
+                <span asp-validation-for="FullName" class="field-error"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control input" autocomplete="email" placeholder="vd. anv@fpt.edu.vn">
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control input" autocomplete="username" placeholder="vd. manager_cntt">
+                <span asp-validation-for="Username" class="field-error"></span>
+            </div>
+            <div class="row g-3">
+                <div class="col-sm-6 field">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control input" autocomplete="new-password">
+                    <span class="hint">Tối thiểu 8 ký tự.</span>
+                    <span asp-validation-for="Password" class="field-error"></span>
+                </div>
+                <div class="col-sm-6 field">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control input" autocomplete="new-password">
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-lg" type="submit">Tạo tài khoản</button>
+            <a asp-controller="Account" asp-action="Login" class="text-center fw-semibold small-link">Đã có tài khoản? Đăng nhập</a>
+        </form>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

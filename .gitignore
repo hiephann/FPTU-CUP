@@ -6,3 +6,9 @@
 # Build output
 bin/
 obj/
+
+# Logo đội do người dùng upload (dữ liệu chạy thử, không đưa lên git)
+fptu_cup/wwwroot/uploads/
+
+# Email chạy thử (khi chưa cấu hình SMTP) được ghi thành file .eml
+fptu_cup/App_Data/

@@ -17,6 +17,7 @@ namespace fptu_cup.Data.Configurations
             builder.Property(x => x.FullName).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Email).HasMaxLength(100).IsRequired();
             builder.Property(x => x.Role).HasConversion<string>().HasMaxLength(20).IsRequired();
+            builder.Property(x => x.SecurityStamp).HasMaxLength(64);
             builder.Property(x => x.CreatedAt).HasColumnType("datetime2").HasDefaultValueSql("SYSUTCDATETIME()");
 
             builder.HasIndex(x => x.Username).IsUnique().HasDatabaseName("UQ_Users_Username");

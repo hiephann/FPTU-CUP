@@ -1,0 +1,5 @@
+@model string
+@* Model: class CSS của nút. Đăng xuất = POST /logout (xóa cookie Identity); app.js xóa JWT trong localStorage khi form submit. *@
+<form asp-controller="Account" asp-action="Logout" method="post" class="logout-form" data-logout>
+    <button type="submit" class="@Model">Đăng xuất</button>
+</form>

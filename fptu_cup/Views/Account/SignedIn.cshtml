@@ -1,0 +1,19 @@
+@model SignedInViewModel
+@{
+    ViewData["Title"] = "Đang chuyển trang – FPTU Cup";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth">
+    <section class="auth-panel">
+        <p class="muted" role="status">Đăng nhập thành công, đang chuyển trang… <a href="@Model.RedirectUrl">Bấm vào đây</a> nếu trình duyệt không tự chuyển.</p>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        // Cookie Identity đã được cấp; lưu JWT cho JS gọi /api/... rồi chuyển tới khu vực theo vai trò.
+        App.setSession(@Json.Serialize(Model.Token), @Json.Serialize(Model.User));
+        location.replace(@Json.Serialize(Model.RedirectUrl));
+    </script>
+}

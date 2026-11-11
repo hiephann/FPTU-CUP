@@ -8,7 +8,15 @@ App.main = async function () {
   var m = mres.data;
 
   var mine = (await App.get('/api/teams/mine')).data || [];
-  var team = mine.filter(function (t) { return t.id === m.homeTeam.id || t.id === m.awayTeam.id; })[0];
+  // Admin nhận về mọi đội nên có cả hai đội của trận: chọn bằng ?team=<id>, kèm liên kết chuyển sang đội kia.
+  var candidates = mine.filter(function (t) { return t.id === m.homeTeam.id || t.id === m.awayTeam.id; });
+  var wanted = +new URLSearchParams(location.search).get('team');
+  var team = candidates.filter(function (t) { return t.id === wanted; })[0] || candidates[0];
+  if (team && candidates.length > 1) {
+    var other = candidates.filter(function (t) { return t.id !== team.id; })[0];
+    root.insertAdjacentHTML('beforebegin', '<div class="banner banner-info">Admin đang nộp đội hình thay cho <b>' + App.esc(team.name) +
+      '</b>. <a href="?team=' + other.id + '">Chuyển sang ' + App.esc(other.name) + '</a></div>');
+  }
   if (!team) { root.innerHTML = '<p class="muted">Đội của bạn không thi đấu trận này.</p><a class="btn" href="/manager/team">Về đội của tôi</a>'; return; }
 
   var isHome = team.id === m.homeTeam.id;
@@ -16,7 +24,7 @@ App.main = async function () {
   var opponent = isHome ? m.awayTeam : m.homeTeam;
   var deadline = new Date(m.lineupDeadline);
   var overdue = App.vnNow() > deadline;
-  var locked = m.status !== 'Scheduled' || overdue;
+  var locked = m.status !== 'Scheduled' || (overdue && !App.isAdmin()); // Admin nộp thay được cả khi quá hạn
 
   var res = await Promise.all([
     App.get('/api/teams/' + team.id + '/players'),
@@ -32,7 +40,7 @@ App.main = async function () {
 
   root.innerHTML =
     '<div class="row-between" style="align-items:flex-end"><div><span class="eyebrow">Vòng ' + m.round + ' · ' + (isHome ? 'Sân nhà' : 'Sân khách') + '</span>' +
-    '<h1>' + App.esc(team.name) + ' vs ' + App.esc(opponent.name) + '</h1><p class="muted">' + App.dayLongFull(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + ' · ' + App.esc(m.venue || 'Chưa có sân') + '</p></div>' +
+    '<h1>' + App.avatar(team.id, team.name, 'sm') + ' ' + App.esc(team.name) + ' <span class="vs">vs</span> ' + App.avatar(opponent.id, opponent.name, 'sm') + ' ' + App.esc(opponent.name) + '</h1><p class="muted">' + App.dayLongFull(m.kickoffTime) + ' · ' + App.hhmm(m.kickoffTime) + ' · ' + App.esc(m.venue || 'Chưa có sân') + '</p></div>' +
     '<a class="btn" href="/manager/team">Danh sách cầu thủ</a></div>' +
     '<div class="banner ' + (locked ? 'banner-warn' : 'banner-info') + '">' + (
       m.forfeitReason ? '<b>' + (m.forfeitTeamId ? 'Xử thua:' : 'Hủy trận:') + '</b> ' + App.esc(m.forfeitReason)
