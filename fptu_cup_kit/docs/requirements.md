@@ -241,6 +241,10 @@ Quy ước: khóa chính kiểu INT IDENTITY; thời gian lưu kiểu DATETIME2 
 | BR21 | Thay người: cầu thủ ra phải đang trên sân, cầu thủ vào phải là dự bị chưa vào sân; cầu thủ đã bị thay ra không được vào lại; cầu thủ nhận thẻ đỏ không được thay thế. |
 | BR22 | Bàn thắng chỉ được ghi cho cầu thủ đang có mặt trên sân tại phút đó (tính từ đội hình xuất phát và các lần thay người). |
 | BR23 | Hạn nộp đội hình là trước giờ đá 1 ngày (giờ Việt Nam). Quá hạn: đội không nộp bị xử thua 0–3 (trận Finished, ghi `ForfeitTeamId` và `ForfeitReason`, tính điểm như một trận thua/thắng thường); cả hai đội không nộp thì trận bị hủy (Cancelled) kèm lý do. Hệ thống tự xử lý mỗi phút, Admin có thể chạy ngay bằng `POST /api/matches/process-forfeits`. |
+| BR24 | Admin là quyền tối cao: làm được mọi thao tác của Team Manager và Referee cho bất kỳ đội/trận nào, bỏ qua kiểm tra sở hữu, BR04 và hạn nộp đội hình BR23 (khi trận còn Scheduled). Các quy tắc toàn vẹn dữ liệu (BR01–BR03, BR06–BR22) vẫn áp dụng cho Admin. |
+| BR25 | Logo đội là ảnh PNG, JPG, WEBP hoặc GIF tối đa 1 MB, kiểm tra bằng chữ ký file (từ chối SVG). `LogoUrl` chỉ nhận link http(s) hoặc đường dẫn `/uploads/logos/...`. Đội chưa có logo dùng logo mặc định. |
+| BR26 | Link đặt lại mật khẩu có hiệu lực 30 phút, dùng một lần; link xác nhận email có hiệu lực 24 giờ. Đổi/đặt lại mật khẩu hoặc đổi email làm các link đã gửi và phiên đăng nhập khác hết hiệu lực. Quên mật khẩu luôn trả cùng một thông báo. Đổi email cần mật khẩu hiện tại và phải xác nhận lại. |
+| BR27 | Giờ đá phải từ 00:00 ngày mai (giờ Việt Nam) trở đi: không tạo trận, không dời trận và không sinh lịch vào hôm nay hay quá khứ. Khi đổi lịch, chỉ xét nếu giờ đá thay đổi (giữ nguyên giờ thì vẫn đổi sân / phân công trọng tài được). |
 
 ## 9. Đặc tả thiết kế API
 

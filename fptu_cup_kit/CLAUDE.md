@@ -27,7 +27,7 @@ Tài liệu gốc (khi có mâu thuẫn, ưu tiên theo thứ tự này):
 Project nằm ở `fptu_cup/` (namespace `fptu_cup`). Không có Service/Repository/interface: controller inject thẳng `FptuCupDbContext` và viết logic trong controller.
 
 ```
-Controllers/          // API controller: [ApiController], logic + kiểm tra BR01–BR23 viết thẳng ở đây
+Controllers/          // API controller: [ApiController], logic + kiểm tra BR01–BR27 viết thẳng ở đây
   ApiControllerBase   // CurrentUserId, Success()/Created201()/Conflict409()... trả { success, message, data }
   PagesController     // chỉ trả View(); trang quản lý chặn bằng [Authorize(Roles = ...)] (cookie Identity)
   AccountController   // MVC: /login, /register, /logout, /access-denied bằng UserManager/SignInManager
@@ -79,7 +79,7 @@ Program.cs, appsettings.json
 - Giờ đá (`KickoffTime`) lưu theo giờ địa phương Việt Nam (UTC+7); so sánh với "bây giờ" dùng `VietnamTime.Now`.
 - Hạn nộp đội hình = trước giờ đá 1 ngày (BR23). Quá hạn: đội thiếu đội hình bị xử thua 0–3 (ghi `ForfeitTeamId` + `ForfeitReason`), cả hai thiếu thì hủy trận; `ForfeitWorker` tự chạy mỗi phút.
 
-Danh sách đầy đủ 23 quy tắc nghiệp vụ (BR01–BR23) nằm ở `docs/requirements.md`, mục 8.
+Danh sách đầy đủ 27 quy tắc nghiệp vụ (BR01–BR27) nằm ở `docs/requirements.md`, mục 8.
 Khi viết code cho quy tắc nào, ghi chú mã BR tương ứng trong comment.
 
 ## Vai trò
