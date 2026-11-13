@@ -30,7 +30,7 @@
         <h2>Sinh lịch vòng tròn</h2>
         <form id="generate-form">
             <div class="form-grid">
-                <div class="field"><label for="g-first">Ngày đá vòng 1</label><input class="input" id="g-first" name="firstKickoff" type="date" required></div>
+                <div class="field"><label for="g-first">Ngày đá vòng 1 (từ ngày mai)</label><input class="input" id="g-first" name="firstKickoff" type="date" required></div>
                 <div class="field"><label for="g-days">Số ngày giữa các vòng</label><input class="input" id="g-days" name="daysBetweenRounds" type="number" min="1" value="7" required></div>
                 <div class="field"><label for="g-times">Khung giờ (cách nhau dấu phẩy)</label><input class="input" id="g-times" name="kickoffTimes" value="08:00, 09:10, 10:20, 11:30" required></div>
                 <div class="field"><label>Sân sử dụng</label><div class="check-row" id="g-venues"></div></div>
@@ -47,7 +47,7 @@
                 <div class="field"><label for="m-home">Đội nhà</label><select class="input" id="m-home" name="homeTeamId"></select></div>
                 <div class="field"><label for="m-away">Đội khách</label><select class="input" id="m-away" name="awayTeamId"></select></div>
                 <div class="field"><label for="m-round">Vòng</label><input class="input" id="m-round" name="round" type="number" min="1" value="1" required></div>
-                <div class="field"><label for="m-time">Giờ đá</label><input class="input" id="m-time" name="kickoffTime" type="datetime-local" required></div>
+                <div class="field"><label for="m-time">Giờ đá (từ ngày mai)</label><input class="input" id="m-time" name="kickoffTime" type="datetime-local" required></div>
                 <div class="field"><label for="m-venue">Sân</label><select class="input" id="m-venue" name="venueId"></select></div>
                 <div class="field"><label for="m-ref">Trọng tài</label><select class="input" id="m-ref" name="refereeId"></select></div>
             </div>

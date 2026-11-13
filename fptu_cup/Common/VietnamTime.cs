@@ -11,6 +11,9 @@ namespace fptu_cup.Common
 
         public static DateTime Now => DateTime.UtcNow.AddHours(7);
 
+        /// <summary>00:00 ngày mai theo giờ Việt Nam – giờ đá sớm nhất được phép khi tạo / đổi lịch trận (BR27).</summary>
+        public static DateTime EarliestKickoff => Now.Date.AddDays(1);
+
         /// <summary>Múi giờ cố định UTC+7 (không phụ thuộc tên múi giờ của hệ điều hành).</summary>
         public static readonly TimeZoneInfo Zone = TimeZoneInfo.CreateCustomTimeZone("Vietnam", TimeSpan.FromHours(7), "Giờ Việt Nam", "Giờ Việt Nam");
 
