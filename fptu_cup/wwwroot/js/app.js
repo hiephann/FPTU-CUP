@@ -211,6 +211,13 @@
     return App.MATCH_STATUS[m.status];
   };
   /** Giá trị cho input datetime-local. */
+  /** BR27: 00:00 ngày mai giờ Việt Nam, dạng dùng cho thuộc tính min của ô date / datetime-local. */
+  App.minKickoff = function () {
+    var d = App.vnNow();
+    d.setDate(d.getDate() + 1);
+    var day = d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+    return { date: day, dateTime: day + 'T00:00' };
+  };
   App.inputDateTime = function (s) {
     var d = new Date(s);
     return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
