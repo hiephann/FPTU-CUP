@@ -103,10 +103,14 @@ App.main = async function () {
         if (App.report(await App.patch('/api/matches/' + m.id + '/status', { status: act }))) load();
       }
     } else if (act === 'edit') {
+      // BR27: giờ mới phải từ ngày mai. Nếu giờ hiện tại của trận đã sớm hơn (trận hôm nay) thì không đặt min,
+      // để vẫn đổi được sân mà giữ nguyên giờ; server chỉ kiểm tra BR27 khi giờ đá thay đổi.
+      var current = App.inputDateTime(m.kickoffTime);
+      var minDt = App.minKickoff().dateTime;
       var v = await App.formDialog({
         title: 'Đổi lịch ' + m.homeTeam + ' vs ' + m.awayTeam,
         fields: [
-          { name: 'kickoffTime', label: 'Giờ đá', type: 'datetime-local', value: App.inputDateTime(m.kickoffTime), required: true },
+          { name: 'kickoffTime', label: 'Giờ đá (từ ngày mai trở đi)', type: 'datetime-local', value: current, required: true, min: current >= minDt ? minDt : null },
           { name: 'venueId', label: 'Sân', type: 'select', value: m.venueId || '', options: [{ value: '', label: 'Chưa chọn sân' }].concat(venues.map(function (x) { return { value: x.id, label: x.name }; })) },
         ],
       });
@@ -135,6 +139,11 @@ App.main = async function () {
       if (App.report(await App.post('/api/matches/process-forfeits', {}))) load();
     }
   });
+
+  // BR27: ngày / giờ đá phải từ ngày mai (giờ Việt Nam) trở đi
+  var minKick = App.minKickoff();
+  $('#g-first').min = minKick.date;
+  $('#m-time').min = minKick.dateTime;
 
   // Sinh lịch vòng tròn
   var gen = $('#generate-form');

@@ -136,6 +136,8 @@ namespace fptu_cup.Controllers
             var tournament = await _db.Tournaments.FindAsync(req.TournamentId);
             if (tournament == null) return NotFound404("Giải đấu không tồn tại");
             if (tournament.Status != TournamentStatus.Ongoing) return Conflict409("Chỉ tạo trận khi giải ở trạng thái Ongoing");
+            var tooEarly = CheckNotTooEarly(req.KickoffTime);
+            if (tooEarly != null) return tooEarly;
 
             var error = await CheckSchedule(req.TournamentId, req.HomeTeamId, req.AwayTeamId, req.VenueId, req.RefereeId, req.KickoffTime, null);
             if (error != null) return error;
@@ -165,6 +167,12 @@ namespace fptu_cup.Controllers
             if (match == null) return NotFound404("Trận đấu không tồn tại");
             if (match.Status != MatchStatus.Scheduled && match.Status != MatchStatus.Postponed)
                 return Conflict409("Chỉ đổi lịch trận đang ở trạng thái Scheduled hoặc Postponed");
+            // Chỉ xét khi đổi giờ đá: giữ nguyên giờ (chỉ đổi sân / trọng tài) thì trận hôm nay vẫn sửa được.
+            if (req.KickoffTime != match.KickoffTime)
+            {
+                var tooEarly = CheckNotTooEarly(req.KickoffTime);
+                if (tooEarly != null) return tooEarly;
+            }
 
             var error = await CheckSchedule(match.TournamentId, match.HomeTeamId, match.AwayTeamId, req.VenueId, req.RefereeId, req.KickoffTime, id);
             if (error != null) return error;
@@ -191,6 +199,8 @@ namespace fptu_cup.Controllers
             var teams = await _db.Teams.Where(t => t.TournamentId == id && t.Status == TeamStatus.Approved).OrderBy(t => t.Id).ToListAsync();
             if (teams.Count < 2) return Conflict409("Cần ít nhất 2 đội được duyệt");
             if (await _db.Matches.AnyAsync(m => m.TournamentId == id)) return Conflict409("Lịch thi đấu đã tồn tại");
+            if (req.FirstKickoff.ToDateTime(TimeOnly.MinValue) < VietnamTime.EarliestKickoff)
+                return BadRequest400($"Ngày đá đầu tiên phải từ ngày mai ({VietnamTime.EarliestKickoff:dd/MM/yyyy}) trở đi (BR27)");
 
             var times = new List<TimeOnly>();
             foreach (var text in req.KickoffTimes)
@@ -460,6 +470,15 @@ namespace fptu_cup.Controllers
         }
 
         // ------------------------------------------------------------------ Kiểm tra lịch (BR06–BR08)
+
+        /// <summary>BR27: giờ đá phải từ 00:00 ngày mai (giờ Việt Nam) trở đi – không tạo / dời trận vào hôm nay hay quá khứ.</summary>
+        private IActionResult? CheckNotTooEarly(DateTime kickoff)
+        {
+            var earliest = VietnamTime.EarliestKickoff;
+            return kickoff < earliest
+                ? BadRequest400($"Giờ đá phải từ ngày mai trở đi (sớm nhất 00:00 {earliest:dd/MM/yyyy}, giờ Việt Nam) – BR27")
+                : null;
+        }
 
         private async Task<IActionResult?> CheckSchedule(int tournamentId, int homeId, int awayId, int? venueId, int? refereeId,
             DateTime kickoff, int? excludeMatchId)
